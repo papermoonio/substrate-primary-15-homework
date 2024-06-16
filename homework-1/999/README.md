@@ -1,2 +1,0 @@
-学号 999
-polkdot address: 12TXVRyZLgzkXcM3ukzTvPM5odQmxubaPHdoeUn9VPqcPB4B
