@@ -78,8 +78,8 @@ mod tests {
         let triangle = Triangle { bottom: 3.0, height: 5.0 };
         let square = Square { side: 2.0 };
 
-        print_area(&circle);  // Expect: "The area is: <area>"
-        print_area(&triangle); // Expect: "The area is: <area>"
-        print_area(&square);  // Expect: "The area is: <area>"
+        print_area(&circle);
+        print_area(&triangle);
+        print_area(&square);
     }
 }
