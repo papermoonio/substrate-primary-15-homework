@@ -28,3 +28,25 @@ fn main() {
     println!("yellow light duration : {} ", yellow.duration());
     println!("green light duration : {} ", green.duration());
 }
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn red_light_duration() {
+        let light = TrafficLight::RED;
+        assert_eq!(light.duration(), 60);
+    }
+
+    #[test]
+    fn yellow_light_duration() {
+        let light = TrafficLight::YELLOW;
+        assert_eq!(light.duration(), 5);
+    }
+
+    #[test]
+    fn green_light_duration() {
+        let light = TrafficLight::GREEN;
+        assert_eq!(light.duration(), 50);
+    }
+}
