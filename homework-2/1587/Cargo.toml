@@ -1,0 +1,9 @@
+
+[workspace.package]
+authors = ["Jiyuan Zheng"]
+edition = "2021"
+
+
+[workspace]
+resolver = "2"
+members = ["bubble-sort", "print-area", "sum-u32", "traffic-light"]
