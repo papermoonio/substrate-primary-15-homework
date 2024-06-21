@@ -1,0 +1,8 @@
+[package]
+name = "ShapeArea_4"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+assert_cmd = "1.0"
+predicates = "1.0"
