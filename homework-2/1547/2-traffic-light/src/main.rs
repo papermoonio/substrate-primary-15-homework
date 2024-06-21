@@ -29,6 +29,7 @@ fn main() {
     println!("green light duration : {} ", green.duration());
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
