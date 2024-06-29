@@ -1,12 +1,11 @@
 // Copyright (c) david Technologies Co.Ltd. 2015-2022. 
 // All rights reserved. Licensed under Apache-2.0.
 
-use crate::area::area::{Area};
-use std;
+use crate::area::{Area};
 
 pub struct Circle <T>{
     // 半径
-    radius: T,
+    pub radius: T,
 }
 
 /// 计算圆面积
@@ -15,6 +14,10 @@ pub struct Circle <T>{
 /// # Examples
 ///
 /// ```
+/// use homework2::area::circle::Circle;
+/// use homework2::area::Area;
+/// let circle = Circle { radius: 3 };
+/// let circle_area = circle.area();
 /// ```
 ///
 impl <T> Area<T> for Circle <T>
