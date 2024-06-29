@@ -39,3 +39,10 @@
     ```
 
 - 创建后，再对应的目录，使用`cargo run`就可以看到正常输出的**hello world**
+
+
+### 资源
+
+- Rust教程: [https://www.runoob.com/rust/rust-tutorial.html](https://www.runoob.com/rust/rust-tutorial.html)
+
+- 冒泡算法的说明: [https://blog.csdn.net/guoweimelon/article/details/50902597](https://blog.csdn.net/guoweimelon/article/details/50902597)
