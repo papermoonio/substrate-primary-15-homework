@@ -68,8 +68,31 @@ fn sort_vector(vec: &mut Vec<i32>) {
         println!("Round[{}]: {:?}",i,vec);
         i += 1;
     }
-
+    
     println!("-------------------" );
     println!("Done: {:?}",vec );
     println!("****** End of sorting ******\n" );
+}
+
+//Unit test, run by `cargo test`
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sort_01() {
+        let expected = vec![12, 18, 23, 31, 33, 67, 88];
+        let mut test_1:Vec<i32>=vec![23,33,12,67,18,88,31];
+        sort_vector(&mut test_1);
+        assert_eq!(test_1, expected);
+    }
+
+    #[test]
+    fn test_sort_02() {
+        let expected = vec![12, 18, 23, 31, 33, 67, 88];
+        let mut test_1:Vec<i32>=vec![23,33,12,67,18,88,31];
+        sort_self(&mut test_1,0);
+        assert_eq!(test_1, expected);
+    }
 }
