@@ -23,12 +23,12 @@ fn sum(arr: &[u32]) -> Option<u32> {
     let mut i=0;
     let mut result:u32=0;
     while i<arr.len() {
-        if result.checked_add(arr[i]).is_none() {
-            return None;
-        }else{
-            result += arr[i];
-            i += 1;
-        }
+        if result.checked_add(arr[i]).is_none(){
+           return None;
+        } 
+
+        result += arr[i];
+        i += 1;
     }
     return Some(result);
 }
