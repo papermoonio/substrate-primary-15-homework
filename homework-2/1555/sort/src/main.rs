@@ -1,22 +1,55 @@
 fn main() {
-    println!("Homework_2 - task_1:");
-
+    println!("\n\nHomework-2 #task_1: Bubble Sort Algorithm");
+    println!("冒泡算法，Rust支持中文输出。");
+    
+    //1.双循环的写法
     let mut test_1:Vec<i32>=vec![23,33,12,67,18,88,31];
-
     let mut test_2:Vec<i32>=vec![1223,22334,1332,2567,1228,8118,3122,997,3382];
     sort_vector(&mut test_1);
-    sort_vector(&mut test_2)
+    sort_vector(&mut test_2);
+
+    //2.递归的写法
+    let mut self_1:Vec<i32>=vec![21,34,12,66,13,17,31];
+    let mut self_2:Vec<i32>=vec![2223,7334,7332,5537,1224,7118,112,9917,3389];
+    sort_self(&mut self_1,0);
+    sort_self(&mut self_2,0);
+}
+
+fn sort_self(vec: &mut Vec<i32>,done:usize){
+    if done==0 {
+        println!("\n****** Start of sorting ******" );
+        println!("Orginal array: {:?}",vec );
+    }else{
+        if done==vec.len()-1 {
+            println!("-------------------" );
+            return println!("Done: {:?}",vec );
+        }
+    }
+
+    let mut i = 0;
+    let mut tmp:i32;
+    while i < vec.len()-1-done {
+        if vec[i+1] < vec[i] {
+            tmp=vec[i];
+            vec[i]=vec[i+1];
+            vec[i+1]=tmp;
+        }
+        i += 1;
+    }
+    println!("Round[{}]: {:?}",done,vec );
+    return sort_self(vec, done+1);
 }
 
 fn sort_vector(vec: &mut Vec<i32>) {
     println!("\n****** Start of sorting ******" );
     println!("Orginal array: {:?}",vec );
     println!("-------------------" );
+
     let mut i = 0;
-    let mut tmp:i32;
     while i < vec.len()-1 {
 
         let mut j = 0;
+        let mut tmp:i32;
         while j < vec.len()-i-1 {
             if vec[j+1] < vec[j] {
                 tmp=vec[j];
@@ -25,6 +58,7 @@ fn sort_vector(vec: &mut Vec<i32>) {
             }
             j += 1;
         }
+
         println!("Round[{}]: {:?}",i,vec);
         i += 1;
     }
