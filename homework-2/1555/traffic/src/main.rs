@@ -1,6 +1,4 @@
-//use light::*;
 pub mod light;
-
 use light::*;
 
 fn main() {
