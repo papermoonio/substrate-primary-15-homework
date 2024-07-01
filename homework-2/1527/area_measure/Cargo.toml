@@ -1,0 +1,8 @@
+[package]
+name = "area_measure"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+test-with = "0.12.6"
+rust_decimal = "1.35.0"
