@@ -1,39 +1,61 @@
-pub trait Shape<T> {
-    fn area(&self) -> T;
+pub struct Shape<T> {
+    pub shape: String,
+    pub more: Vec<T>,
 }
 
-pub struct Circle<T> {
-    radius: T,
-}
+impl <T: Into<f64> + std::fmt::Debug + std::clone::Clone> Shape<T> where Vec<f64>: From<Vec<T>>{
+    pub fn new(shape: String, more: Vec<T>) -> Self {
+        Shape { shape, more }
+    }
 
-impl<T: Into<f64> + Clone > Circle<T> {
-    pub fn new(radius: T) -> Self {
-        Circle { radius }
+    pub fn area(&self) -> f64{
+        let m:Vec<f64> = <Vec<T> as Clone>::clone(&self.more).into();
+        match self.shape.as_str() {
+            "circle" => {
+                let r=m[0];
+                std::f64::consts::PI*r*r
+            },
+            "rectangle"=>{
+                let w=m[0];
+                let h=m[1];
+                w * h
+            },
+            _ => {
+                0.0
+            },
+        }
     }
 }
 
-impl<T: Into<f64> + Clone > Shape<f64> for Circle<T> {
-    fn area(&self) -> f64 {
-        let radius: f64 = self.radius.clone().into();
-        std::f64::consts::PI * radius * radius
-    }
-}
+// pub struct Shape<T> {
+//     pub shape: String,
+//     pub more: Vec<T>,
+// }
 
-pub struct Rectangle<T> {
-    width: T,
-    height: T,
-}
+// impl <T: Into<f64> + std::fmt::Debug + std::clone::Clone> Shape<T> where Vec<f64>: From<Vec<T>>{
+//     pub fn new(shape: String, more: Vec<T>) -> Self {
+//         Shape { shape, more }
+//     }
 
-impl<T: Into<f64> + Clone > Rectangle<T> {
-    pub fn new(width: T, height: T) -> Self {
-        Rectangle { width, height }
-    }
-}
+    // pub fn display(&self) {
+    //     println!("Shape: {}, more: {:?}", self.shape, self.more);
+    // }
 
-impl<T: Into<f64> + Clone > Shape<f64> for Rectangle<T> {
-    fn area(&self) -> f64 {
-        let width: f64 = self.width.clone().into();
-        let height: f64 = self.height.clone().into();
-        width * height
-    }
-}
+//     pub fn area(&self) -> f64{
+//         let m:Vec<f64> = <Vec<T> as Clone>::clone(&self.more).into();
+//         match self.shape.as_str() {
+//             "circle" => {
+//                 let r=m[0];
+//                 std::f64::consts::PI*r*r
+//             },
+//             "rectangle"=>{
+//                 let w=m[0];
+//                 let h=m[1];
+//                 w * h
+//             },
+//             _ => {
+//                 0.0
+//             },
+//         }
+//     }
+// }

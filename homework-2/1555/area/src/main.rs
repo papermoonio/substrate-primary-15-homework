@@ -6,17 +6,12 @@ use shape::*;
 fn main() {
     println!("Homework_2 - task_4:");
 
-    let circle = Circle::new(5.0);
-    let rectangle = Rectangle::new(4.0, 6.0);
+    let shape_01 = Shape::new(String::from("circle"),vec![1.0]);
+    //shape_01.display();
+    println!("Shape is {}, area is {}",shape_01.shape, shape_01.area());
 
-    println!("Area of the circle: {}", circle.area());
-    println!("Area of the rectangle: {}", rectangle.area());
-
-    let int_circle = Circle::new(5);  // Using integer radius
-    let int_rectangle = Rectangle::new(4, 6);  // Using integer dimensions
-
-    println!("Area of the integer circle: {}", int_circle.area());
-    println!("Area of the integer rectangle: {}", int_rectangle.area());
+    let shape_02 = Shape::new("rectangle".to_string(),vec![8.0,9.0]);
+    println!("Shape is {}, area is {}",shape_02.shape, shape_02.area());
 }
 
 
