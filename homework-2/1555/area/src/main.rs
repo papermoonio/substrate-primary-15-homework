@@ -22,11 +22,15 @@ mod tests {
 
     #[test]
     fn test_circle() {
-        
+        let expected=3.141592653589793;
+        let sp = Shape::new(String::from("circle"),vec![1.0]);
+        assert_eq!(sp.area(), expected);
     }
 
     #[test]
     fn test_rectangle() {
-        
+        let expected=48.0;
+        let sp = Shape::new(String::from("rectangle"),vec![8.0,6.0]);
+        assert_eq!(sp.area(), expected);
     }
 }

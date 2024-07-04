@@ -32,3 +32,24 @@ fn sum(arr: &[u32]) -> Option<u32> {
     }
     return Some(result);
 }
+
+//Unit test, run by `cargo test`
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sum_normal() {
+        let arr:[u32; 7]=[1,2,3,4,5,6,7];
+        let expected = 28;
+        assert_eq!(sum(&arr), Some(expected));
+    }
+
+    #[test]
+    fn test_sum_overflow() {
+        let arr:[u32; 3]=[4294967295,3,2];
+        let expected = None;
+        assert_eq!(sum(&arr), expected);
+    }
+}
