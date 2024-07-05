@@ -1,0 +1,12 @@
+[package]
+name = "bubble-sort-boost"
+version = "0.1.0"
+edition = "2021"
+
+
+[lib]
+name = "bubble_sort_boost"
+path = "src/lib.rs"
+
+[dependencies]
+rand = "0.8.5"

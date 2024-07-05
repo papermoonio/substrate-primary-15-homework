@@ -1,0 +1,12 @@
+#[package]
+#name = "homework-2"
+#version = "0.1.0"
+#description = "this is project contains two parts: basic bubble sort and boost bubble sort"
+#
+
+[workspace]
+resolver = "2"
+members = [
+    "bubble-sort-basic",
+    "bubble-sort-boost"
+]

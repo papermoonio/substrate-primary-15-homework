@@ -1,0 +1,13 @@
+[package]
+name = "bubble-sort-basic"
+version = "0.1.0"
+edition = "2021"
+
+
+[lib]
+name = "bubble_sort_basic"
+path = "src/lib.rs"
+
+[dependencies]
+rand = "0.8.5"
+
