@@ -1,0 +1,8 @@
+[package]
+name = "summation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+test-with = "0.12.6"
+rand = "0.8.5"
