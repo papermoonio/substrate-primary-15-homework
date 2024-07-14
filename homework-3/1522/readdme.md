@@ -1,0 +1,2 @@
+1. polkadot-wallet-react中用react构建UI界面实现基本钱包功能
+2. pallets中新增poe模块whxModule存证交易基本功能
