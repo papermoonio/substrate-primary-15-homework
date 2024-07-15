@@ -1,0 +1,17 @@
+[package]
+name = "mywallet"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = "1.0.204"
+serde_json = "1.0.120"
+subxt = {version = "0.37.0", features = ["substrate-compat"] }
+subxt-signer = "0.37.0"
+hex = "0.4"
+clap = { version = "4.5.3", features = ["derive"] }
+rpassword = "7.0"
+tokio = { version = "1", features = ["full"] }
+sp-core = "31.0.0"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
