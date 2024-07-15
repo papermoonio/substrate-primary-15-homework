@@ -5,7 +5,8 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 
 import AccountAdd from './component/account_add';
 import AccountList from './component/account_list';
-
+import PaymentDetails from './component/payment_details';
+import TransactionSearch from './component/transaction_search';
 
 let wsAPI = null;
 let linking = false;
@@ -31,7 +32,11 @@ function App() {
       self.fresh(num);
     },
     callbackNewAccount: (acc) => {
-      console.log(acc);
+      const nlist=[acc];
+      for(let i=0;i<accounts.length;i++){
+        nlist.push(accounts[i]);
+      }
+      setAccounts(nlist);
     },
     init: (ck,node) => {
       const uri = nodes[node];
@@ -93,14 +98,17 @@ function App() {
         id="uncontrolled-tab-example"
         className="mb-3"
       >
-        <Tab eventKey="account" title="Account Demo">
+        <Tab eventKey="account" title="Account Management">
           <AccountAdd API={wsAPI} callback={(json,mnemonic) => {
             self.callbackNewAccount(json);
           }} />
           <AccountList list={accounts} />
         </Tab>
-        <Tab eventKey="transaction" title="Transaction Demo">
-          account functions
+        <Tab eventKey="payment" title="Payment Details">
+          <PaymentDetails list={accounts} />
+        </Tab>
+        <Tab eventKey="transaction" title="Transaction Search">
+          <TransactionSearch />
         </Tab>
       </Tabs>
     </Container>
