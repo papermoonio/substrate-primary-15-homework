@@ -22,7 +22,12 @@ function AccountList(props) {
       });
     },
     clickDownload: (index) => {
-
+      const acc=props.list[index];
+      const dt=JSON.parse(JSON.stringify(acc));
+      delete dt.password;
+      delete dt.mnemonic;
+      dt.meta={from:"demo",auth:"Fuu"}
+      self.download(`${acc.address}.json`,JSON.stringify(dt));
     },
     getMulti: () => {
       return 1000000000000;
@@ -34,6 +39,7 @@ function AccountList(props) {
       return (free*self.getDivide()).toLocaleString();
     },
     faucet: (address, amount, ck) => {
+      setInfo("");
       const keyring = new Keyring({ type: 'sr25519' });
       const pair = keyring.addFromUri('//Alice');
       const API = props.API;
@@ -41,7 +47,7 @@ function AccountList(props) {
       try {
         API.tx.balances.transferAllowDeath(address, parseInt(amount * m)).signAndSend(pair, (res) => {
           const status = res.status.toJSON();
-          console.log(status);
+          setInfo(JSON.stringify(status));
           if(status.finalized) return ck && ck(status.finalized);
         });
       } catch (error) {
@@ -79,6 +85,26 @@ function AccountList(props) {
           }
         });
       }
+    },
+    download: (filename, text, type) => {
+      const element = document.createElement('a');
+      switch (type) {
+        case "image":
+          element.setAttribute('href', text);
+          break;
+  
+        default:
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+          break;
+      }
+  
+      element.setAttribute('download', filename);
+  
+      element.style.display = 'none';
+      document.body.appendChild(element);
+  
+      element.click();
+      document.body.removeChild(element);
     },
   }
 

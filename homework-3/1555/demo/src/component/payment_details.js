@@ -54,7 +54,7 @@ function PaymentDetails(props) {
               try {
                 API.tx.balances.transferAllowDeath(target, parseInt(amount * m)).signAndSend(pair, (res) => {
                   const status = res.status.toJSON();
-                  console.log(status);
+                  setInfo(JSON.stringify(status));
                   if(status.finalized){
                     setPassword("");
                     setAmount(0);

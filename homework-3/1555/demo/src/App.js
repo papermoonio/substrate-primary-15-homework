@@ -107,9 +107,9 @@ function App() {
         <Tab eventKey="payment" title="Payment Details">
           <PaymentDetails   API={wsAPI}  list={accounts} />
         </Tab>
-        <Tab eventKey="transaction" title="Transaction Search">
+        {/* <Tab eventKey="transaction" title="Transaction Search">
           <TransactionSearch  API={wsAPI} />
-        </Tab>
+        </Tab> */}
       </Tabs>
     </Container>
   );
