@@ -13,7 +13,6 @@ function AccountAdd(props) {
   let [disable, setDisable] = useState(true);
   let [password, setPassword] = useState("");
   let [info, setInfo] = useState("");
-  let [list, setList] = useState([]);
 
   const self = {
     clickAdd: () => {
@@ -23,6 +22,7 @@ function AccountAdd(props) {
       const sign = pair.toJson(password);
       sign.password=password;       //!important, just for demo, please don't save password anywhere
       sign.mnemonic=mnemonic;       //!important, just for demo, please don't save mnemonic anywhere
+      setPassword("");
       if(props.callback) props.callback(sign);
     },
     changePassword: (ev) => {

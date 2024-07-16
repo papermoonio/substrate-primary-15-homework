@@ -16,10 +16,12 @@ function AccountList(props) {
     clickFaucet: (address) => {
       const amount = self.rand(200, 1000);
       setInfo(`Start to transfer ${amount} from Alice to ${address}`);
-      self.faucet(address, amount, (hash) => {
-        console.log(hash);
-        self.fresh();
-      });
+      setTimeout(()=>{
+        self.faucet(address, amount, (res) => {
+          if(res.error) return setInfo(res.error);
+          self.fresh();
+        });
+      },1500);
     },
     clickDownload: (index) => {
       const acc=props.list[index];
@@ -80,7 +82,7 @@ function AccountList(props) {
           map[data.address] = data;
           work--;
           if (work < 1) {
-            console.log(map);
+            //console.log(map);
             setMap(JSON.parse(JSON.stringify(map)));
           }
         });

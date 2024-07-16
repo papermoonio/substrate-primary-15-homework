@@ -104,6 +104,7 @@ function PaymentDetails(props) {
     },
     fresh:()=>{
       //console.log(props.list);
+      if(!props.API) return false;
       if(!props.list || props.list===null || props.list.length===0) return false;
       const account=props.list[0];
 
