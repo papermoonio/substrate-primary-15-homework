@@ -110,6 +110,9 @@ function App() {
         {/* <Tab eventKey="transaction" title="Transaction Search">
           <TransactionSearch  API={wsAPI} />
         </Tab> */}
+        <Tab eventKey="anchor" title="Set Anchor">
+          setAnchor
+        </Tab>
       </Tabs>
     </Container>
   );
