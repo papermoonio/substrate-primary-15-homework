@@ -59,7 +59,7 @@ function App() {
       });
     },
     fresh:(n)=>{
-      console.log(n);
+      //console.log(n);
       setInfo(`Ready to link to node: ${nodes[n]}`);
       self.init(() => {
         setInfo(`Linked to node: ${nodes[n]}`);
@@ -102,13 +102,13 @@ function App() {
           <AccountAdd API={wsAPI} callback={(json,mnemonic) => {
             self.callbackNewAccount(json);
           }} />
-          <AccountList list={accounts} />
+          <AccountList API={wsAPI} list={accounts}/>
         </Tab>
         <Tab eventKey="payment" title="Payment Details">
-          <PaymentDetails list={accounts} />
+          <PaymentDetails   API={wsAPI}  list={accounts} />
         </Tab>
         <Tab eventKey="transaction" title="Transaction Search">
-          <TransactionSearch />
+          <TransactionSearch  API={wsAPI} />
         </Tab>
       </Tabs>
     </Container>
