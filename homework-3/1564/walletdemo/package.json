@@ -1,0 +1,25 @@
+{
+  "name": "walletdemo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@polkadot/api": "^12.2.1",
+    "@polkadot/keyring": "^13.0.2",
+    "@polkadot/util": "^13.0.2",
+    "@polkadot/util-crypto": "^13.0.2",
+    "@substrate/ss58-registry": "^1.49.0",
+    "bignumber.js": "^9.1.2",
+    "vue": "^3.4.31"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "sass": "^1.77.8",
+    "vite": "^5.3.4"
+  }
+}
