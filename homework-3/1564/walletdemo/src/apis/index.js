@@ -4,6 +4,8 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import * as ss58 from "@subsquid/ss58-codec";
 import { providers } from "../config/providers.js";
 import registryJson from "@substrate/ss58-registry";
+import { ElNotification } from "element-plus";
+import Big from 'big.js';
 
 export class Account {
   constructor(pair, mnemonic) {
@@ -11,6 +13,7 @@ export class Account {
     this.pair = pair;
   }
 }
+
 
 export const keyring = new Keyring({ type: "sr25519" });
 
@@ -44,11 +47,14 @@ export async function getBalance(api, address) {
   //   const now = await api.query.timestamp.now();
   // Retrieve the account balance & nonce via the system module
   const { data: balance } = await api.query.system.account(address);
-  const val = BigInt(balance.free);
+//   const num1 = Big('12345678901234567890');
+// const num2 = Big('9876543210987654321');
+  const val = Big(balance.free);
   const decoded = ss58.decode(address);
   const item = registryJson.find((temp) => temp.prefix === decoded.prefix);
-  const decl = BigInt(10 ** item.decimals[0]);
-  return Number(val / decl).toFixed(6) + item.symbols[0];
+  const decl = Big(10 ** item.decimals[0]);
+  console.log("address==balance===", val, val / decl);
+  return val.div(decl).toString() + item.symbols[0];
 }
 
 // 2
@@ -58,23 +64,33 @@ export function getAddress(pair, registryNum = 0) {
 
 // 3
 
-export  function transfer(api, from, to, amount) {
-  return new Promise(async (resolve,reject)=>{
+export function transfer(api, account, to, amount) {
+  amount = amount * 10 ** 12;
+  return new Promise(async (resolve, reject) => {
     try {
       const tx = await api.tx.balances.transferKeepAlive(to, amount);
-      await tx.signAndSend(keyring, ({ events = [], status }) => {
+      await tx.signAndSend(account.pair, ({ events = [], status }) => {
+        console.log("events===", events, status.toString());
+        ElNotification({
+          title: "event",
+          type: "success",
+          message: status.toString(),
+          position: "bottom-left",
+        });
         if (status.isFinalized) {
           console.log(
-            `从[from:${from}->to:${to} amount:${amount}]的转账成功。\n交易状态哈希：${status.hash.toHex()}`
+            `从[from:${
+              account.name
+            }->to:${to} amount:${amount}]的转账成功。\n交易状态哈希：${status.hash.toHex()}`
           );
-          resolve(status.hash);
+          resolve(status.hash.toHex());
         }
       });
     } catch (error) {
-      console.log('error===',error);
+      console.log("error===", error);
       reject(error);
     }
-  })
+  });
 }
 
 // 4

@@ -6,6 +6,7 @@ import {
   getAddress,
   createApi,
   getBalance,
+  subscribe,
   Account,
   transfer,
 } from "../apis";
@@ -63,11 +64,15 @@ class WalletContext {
     return apis[network];
   }
 
-  async transfer(network,from,to,account){
-    debugger;
+  async transfer(network,account,toaddress,amount){
     const api = await this.resolveApi(network);
-    const hash = await transfer(api,from,to,account);
+    const hash = await transfer(api, account,toaddress,amount);
     return hash;
+  }
+
+  async subscribe(network, address,listener){
+    const api = await this.resolveApi(network);
+    subscribe(api, address,listener);
   }
 }
 

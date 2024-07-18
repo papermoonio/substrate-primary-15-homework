@@ -94,6 +94,7 @@
             <div class="layer2">
               <span>余额:{{ item.balance || 0 }}</span>
               <div class="links">
+                <el-switch v-model="item.dosub" @change="handleSub(item)" />
                 <button class="btn" @click="showBalance(item)">查询余额</button>
               </div>
             </div>
@@ -106,7 +107,7 @@
                 v-model="item.toaddress" />
             </div>
             <div class="layer3">
-              <label for="">金额</label>
+              <label for="">数量({{ item.symbol }})</label>
               <input
                 type="text"
                 style="width: 460px"
@@ -114,9 +115,10 @@
                 v-model="item.toamount" />
             </div>
 
-           <div class="layer4">
-            <button class="btn" @click="toTransfer(item)">转账</button>
-           </div>
+            <div class="layer4">
+               <span v-if="item.hash">交易hash: <a :href="item.explorer+'/'+item.hash" target="__blank">{{item.hash}}</a></span>
+              <button class="btn" @click="toTransfer(item)">转账</button>
+            </div>
           </li>
         </ul>
       </div>
@@ -128,6 +130,7 @@
 import { walletContext } from "../context";
 // import registryJson from "@substrate/ss58-registry";
 import "./style.scss";
+import { ElNotification } from "element-plus";
 
 const registryJson = [
   {
@@ -138,6 +141,8 @@ const registryJson = [
     decimals: [10],
     standardAccount: "*25519",
     website: "https://polkadot.network",
+    explorer:"https://polkadot.subscan.io/extrinsic/",
+    testto:"1RFdWnR4gUY5mPvBtFaxdeFsDJAuuoDiJYhF7bvBgyFUKy5",
   },
   {
     prefix: 2,
@@ -146,16 +151,20 @@ const registryJson = [
     symbols: ["KSM"],
     decimals: [12],
     standardAccount: "*25519",
+    explorer:"https://kusama.subscan.io/extrinsic/",
     website: "https://kusama.network",
+    testto:"Cza9VsDqGDzPtCqzx1diSB7ABam2H4G6BexUUtX7QAE2vAd",
   },
   {
     prefix: 137,
-    network: "varatest",
-    displayName: "Vara Test Network",
+    network: "vara",
+    displayName: "Vara Network",
     symbols: ["VARA"],
     decimals: [12],
     standardAccount: "*25519",
     website: "https://vara.network/",
+    explorer:"https://vara.subscan.io/extrinsic/",
+    testto:"kGfxF2ew9eSRnSAdj92xzW2kFXa47MX6g9vT5aZQr2ehe56T5",
   },
 ];
 
@@ -243,17 +252,20 @@ export default {
       const account = walletContext.wallets.find(
         (temp) => temp.name === this.selectedAcc
       );
-      const list = [];
-      this.validRegistrys.forEach((temp) => {
+      this.addressList = [];
+      this.validRegistrys.forEach(async (temp) => {
         try {
           temp.address = walletContext.getAddress(account, temp.prefix);
-          list.push(temp);
+          temp.toaddress = temp.testto;
+          temp.toamount = 1;
+          temp.balance = await walletContext.getBalance(temp.network,temp.address);
+          temp.symbol  =  temp.symbols[0];
+
+          this.addressList.push(temp);
         } catch (error) {
-          console.log("exception===", temp);
+          console.log("exception===", error);
         }
       });
-      this.addressList = list;
-      console.log("addressList", this.addressList);
     },
     showBalance(item) {
       console.log(item);
@@ -263,7 +275,35 @@ export default {
     },
     toTransfer(item) {
       console.log("transfer===", item);
-      walletContext.transfer(item.network, item.address, item.toaddress);
+      item.hash="";
+      const account = this.accounts.find(
+        (temp) => temp.name === this.selectedAcc
+      );
+      walletContext
+        .transfer(item.network, account, item.toaddress, item.toamount)
+        .then((hash) => {
+          item.hash=hash;
+          this.showBalance(item);
+        });
+    },
+    handleSub(item) {
+      if (item.dosub) {
+        walletContext
+          .subscribe(item.network, item.address,  (event)=> {
+            ElNotification({
+              title: "balance:" + item.address,
+              type:"info",
+              message: "message:balance=" + event,
+              position: "bottom-left",
+            });
+            this.showBalance(item);
+          })
+          .then((unsub) => {
+            item.__unsub = unsub;
+          });
+      } else {
+        item.__unsub && item.__unsub();
+      }
     },
   },
 };
