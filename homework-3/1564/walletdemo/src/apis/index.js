@@ -71,12 +71,14 @@ export function transfer(api, account, to, amount) {
       const tx = await api.tx.balances.transferKeepAlive(to, amount);
       await tx.signAndSend(account.pair, ({ events = [], status }) => {
         console.log("events===", events, status.toString());
+        
         ElNotification({
           title: "event",
           type: "success",
           message: status.toString(),
           position: "bottom-left",
         });
+        debugger;
         if (status.isFinalized) {
           console.log(
             `从[from:${
