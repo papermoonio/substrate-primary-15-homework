@@ -16,9 +16,10 @@
 3. 转账到其他帐号
 * 3.1 首先去 https://polkadot.js.org/apps/#/accounts
 ![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/3_1.png?raw=true)
-3.2 利用開發模式中的戶口轉錢到 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM
+* 3.2 利用開發模式中的戶口轉錢到 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM
 然後由 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM 轉到
 5DkdPxqT8vvfEHzbhAkmg3cQ3ZYYGyyUSVoT8LDmrVDUyagm
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/3_2.png?raw=true)
 3.3 確認交易
 4. 入账提醒
 4.1 當接受到款項，會在頁面出現通知
