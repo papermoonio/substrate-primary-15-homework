@@ -20,9 +20,10 @@
 然後由 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM 轉到
 5DkdPxqT8vvfEHzbhAkmg3cQ3ZYYGyyUSVoT8LDmrVDUyagm
 ![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/3_2.png?raw=true)
-3.3 確認交易
+* 3.3 確認交易
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/3_3.png?raw=true)
 4. 入账提醒
-4.1 當接受到款項，會在頁面出現通知
+* 4.1 當接受到款項，會在頁面出現通知
 5. 调用特定Substrate链的交易 （PoE链）
 5.1 輸入資料的頁面
 5.2 完成後的交易紀錄
