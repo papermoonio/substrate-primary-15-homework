@@ -3,6 +3,8 @@
 ## Task Report:
 1. 可以新建帐号，查看余额
 1.1 去到創建或加入錢包的頁面
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_1.png?raw=true)
+
 1.2 創建新錢包
 1.3 看到新錢包地址
 1.4 查看當下餘額
