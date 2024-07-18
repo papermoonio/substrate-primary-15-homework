@@ -11,9 +11,11 @@
 * 1.4 查看當下餘額
 ![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_4.png?raw=true)
 2. 显示钱包地址
-2.1 可以在登入後顯示錢包完整地址
+* 2.1 可以在登入後顯示錢包完整地址
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/2_1.png?raw=true)
 3. 转账到其他帐号
-3.1 首先去 https://polkadot.js.org/apps/#/accounts
+* 3.1 首先去 https://polkadot.js.org/apps/#/accounts
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/3_1.png?raw=true)
 3.2 利用開發模式中的戶口轉錢到 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM
 然後由 5E1eMotU6YAnv3y7EHSVKtzszrKCPz1ZtmjkpZeSevjoLRNM 轉到
 5DkdPxqT8vvfEHzbhAkmg3cQ3ZYYGyyUSVoT8LDmrVDUyagm
