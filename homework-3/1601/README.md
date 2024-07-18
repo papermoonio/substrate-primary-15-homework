@@ -41,6 +41,6 @@ https://substrate.rs/overview-westend-wnd.html
 
 ### Bug fixed:
 1. Argument of type 'string' is not assignable to parameter of type 'Uint8Array'.ts(2345)
-Solution: 
+* Solution: 
 const encoder = new TextEncoder();
 const uintArrayValue = encoder.encode("String");
