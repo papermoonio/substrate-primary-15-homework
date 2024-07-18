@@ -1,24 +1,19 @@
-import {
-  naclDecrypt,
-  naclEncrypt,
-  mnemonicGenerate,
-} from "@polkadot/util-crypto";
-import { Keyring } from "@polkadot/keyring";
 import localCache from "../utils/localCache";
-import { stringToU8a, u8aToString } from "@polkadot/util";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { providers } from "../config/providers";
-import BigNumber from "bignumber.js";
+import {
+  createAccount,
+  restoreAccount,
+  getAddress,
+  createApi,
+  getBalance,
+} from "../apis";
 
-// create a keyring with some non-default values specified
-const keyring = new Keyring({ type: "sr25519" });
-let index = 0;
+const apis = {};
 
 class WalletContext {
   constructor() {
     this.wallets = {};
-    this.apis = {};
+    this.idx = 0;
     this.ready = cryptoWaitReady().then(() => this.restoreWallet());
   }
   restoreWallet() {
@@ -26,69 +21,42 @@ class WalletContext {
     if (localWallets) {
       Object.keys(localWallets).forEach((key) => {
         const temp = localWallets[key];
-        this.wallets[key] = {
-          words: temp.words,
-          pair: keyring.addFromMnemonic(atob(temp.words)),
-        };
+        this.importWallet(atob(temp.mnemonic));
       });
     }
   }
-  generateWallet(nums = 12) {
-    // generate a mnemonic with default params (we can pass the number
-    // of words required 12, 15, 18, 21 or 24, less than 12 words, while
-    // valid, is not supported since it is more-easily crackable)
+  async generateWallet(nums = 12) {
     // @ts-ignore
-    return mnemonicGenerate(nums);
+    const account = await createAccount(nums);
+    this.importWallet(account.mnemonic);
+    return account;
   }
   importWallet(words) {
-    // // create & add the pair to the keyring with the type and some additional
-    // // metadata specified
-    index++;
-    const name = "Account" + index;
-    const pair = keyring.addFromUri(
-      words,
-      { name: "Account" + index },
-      "ed25519"
-    );
-    this.wallets[name] = {
-      pair,
-      words: btoa(words),
-    };
+    const account = restoreAccount(words);
+    this.idx++;
+    this.wallets[`Account${this.idx}`] = account;
     localCache.setItem("__wallets__", this.wallets);
-
-    // // the pair has been added to our keyring
-    // console.log(keyring.pairs.length, 'pairs available');
-
-    // // log the name & address (the latter encoded with the ss58Format)
-    // console.log(pair.meta.name, 'has address', pair.address);
+    return account;
   }
 
   loadData() {
     return this.ready;
   }
   getAddress(account, registryNum) {
-    const pair = account.pair;
-    return keyring.encodeAddress(pair.publicKey, registryNum);
+    return getAddress(account.pair, registryNum);
   }
-  async getBalance(network, address,decimals) {
-    if (!this.apis[network]) {
-      // Construct
-      const wsProvider = new WsProvider(providers[network]);
-      const api = await ApiPromise.create({ provider: wsProvider });
-      this.apis[network] = api;
-    }
+  async getBalance(network, address) {
+    await this.resolveApi(network);
 
-    const api = this.apis[network];
-
-    // Retrieve the last timestamp
-    const now = await api.query.timestamp.now();
-    // Retrieve the account balance & nonce via the system module
-    const { nonce, data: balance } = await api.query.system.account(address);
-    console.log(network,address, "balance===",balance);
-    console.log(`${now}: balance of ${balance.free} and a nonce of ${nonce}`);
-      // const val = BigNumber.valueOf(balance);
-      return balance.free;
+    return getBalance(api, address);
     // return val.div(10**decimals);
+  }
+
+  async resolveApi() {
+    if (!apis[network]) {
+      apis[network] = await createApi(network);
+    }
+    return apis[network];
   }
 }
 

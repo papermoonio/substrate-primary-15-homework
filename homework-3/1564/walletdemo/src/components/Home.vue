@@ -15,11 +15,7 @@
         <h3>Create Wallet</h3>
         <div>
           <label for="wordslen">Select Words Length:</label>
-          <select
-            v-model="wordslen"
-            @change="regenerate"
-            id="wordslen"
-            class="select">
+          <select v-model="wordslen" @change="regenerate" id="wordslen" class="select">
             <option value="12">12</option>
             <option value="15">15</option>
             <option value="18">18</option>
@@ -36,10 +32,7 @@
       <div v-if="step === 'second_import'" class="setup-box setup-box2">
         <h3>Import Wallet</h3>
         <div class="word-list">
-          <input
-            v-model="importwords"
-            class="input"
-            placeholder="Enter mnemonic words" />
+          <input v-model="importwords" class="input" placeholder="Enter mnemonic words" />
         </div>
         <div class="errormsg">{{ errmsg }}</div>
         <div class="btns">
@@ -71,11 +64,7 @@
       <h1>Welcome to MyWallet by Xuxihai</h1>
       <div class="accounts-list">
         <label for="account-select">Select Account:</label>
-        <select
-          v-model="selectedAcc"
-          @change="changeSelect"
-          id="account-select"
-          class="select">
+        <select v-model="selectedAcc" @change="changeSelect" id="account-select" class="select">
           <option value="">请选择你的账号</option>
           <option v-for="item in accounts" :key="item.name" :value="item.name">
             {{ item.name }}
@@ -94,6 +83,7 @@
             <div class="layer2">
               <span>余额:{{ item.balance || 0 }}</span>
               <div class="links">
+                <input type="text" placeholder="目标地址" v-model="item.toaddress" />
                 <a @click="toTransfer(item)" v-if="item.balance > 0">转账</a>
                 <a @click="showBalance(item)">查询余额</a>
               </div>
@@ -175,14 +165,14 @@ export default {
         this.loading = false;
       });
     },
-    createWallet() {
-      const words = walletContext.generateWallet(12);
+    async createWallet() {
+      const words = await walletContext.generateWallet(12);
       console.log("words===", words);
       this.newwords = words;
       this.step = "second_create";
     },
-    regenerate() {
-      const words = walletContext.generateWallet(parseInt(this.wordslen));
+    async regenerate() {
+      const words = await walletContext.generateWallet(parseInt(this.wordslen));
       console.log("words===", words);
       this.newwords = words;
     },
@@ -228,10 +218,13 @@ export default {
     },
     showBalance(item) {
       console.log(item);
-      walletContext.getBalance(item.network,item.address,item.decimals[0]).then(val=>{
-        item.balance=val+ item.symbol;
+      walletContext.getBalance(item.network, item.address, item.decimals[0]).then(val => {
+        item.balance = val + item.symbol;
       })
     },
+    toTransfer(item) {
+      console.log('transfer===', item);
+    }
   },
 };
 </script>
