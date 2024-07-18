@@ -1,5 +1,6 @@
 .popup-wrap {
     max-width: 800px;
+    min-width: 440px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f9f9f9;
@@ -22,8 +23,8 @@
   
   .setup-box {
     padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    // background-color: #fff;
+    border-bottom: 1px solid #ddd;
     border-radius: 8px;
     margin-bottom: 20px;
   }
@@ -91,7 +92,33 @@
   .address-list .layer2{
     display: flex;
     justify-content: space-between;
+    padding: 4px 12px;
+    button{
+      flex-basis: 104px;
+      height: 40px;
+    }
     .links a{
         cursor: pointer;
     }
+  } .address-list .layer3{
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 12px;
+    input{
+      padding: 8px;
+      font-size: 14px;
+    }
+    button{
+      flex-basis: 104px;
+      height: 40px;
+    }
+    .links a{
+        cursor: pointer;
+    }
+  }
+
+  .layer4{
+    padding: 6px 12px;
+    display: flex;
+    justify-content: end;
   }

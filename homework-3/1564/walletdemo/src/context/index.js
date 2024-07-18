@@ -6,22 +6,23 @@ import {
   getAddress,
   createApi,
   getBalance,
+  Account,
+  transfer,
 } from "../apis";
 
 const apis = {};
 
 class WalletContext {
   constructor() {
-    this.wallets = {};
+    this.wallets = [];
     this.idx = 0;
     this.ready = cryptoWaitReady().then(() => this.restoreWallet());
   }
   restoreWallet() {
     const localWallets = localCache.getItem("__wallets__");
     if (localWallets) {
-      Object.keys(localWallets).forEach((key) => {
-        const temp = localWallets[key];
-        this.importWallet(atob(temp.mnemonic));
+      localWallets.forEach((temp) => {
+        this.importWallet(temp.mnemonic,true);
       });
     }
   }
@@ -31,10 +32,13 @@ class WalletContext {
     this.importWallet(account.mnemonic);
     return account;
   }
-  importWallet(words) {
+  importWallet(words,disableSave) {
     const account = restoreAccount(words);
     this.idx++;
-    this.wallets[`Account${this.idx}`] = account;
+    const name = `Account${this.idx}`;
+    account.name = name;
+    this.wallets.push(account);
+    if(disableSave) return account;
     localCache.setItem("__wallets__", this.wallets);
     return account;
   }
@@ -46,17 +50,24 @@ class WalletContext {
     return getAddress(account.pair, registryNum);
   }
   async getBalance(network, address) {
-    await this.resolveApi(network);
+    const api = await this.resolveApi(network);
 
     return getBalance(api, address);
     // return val.div(10**decimals);
   }
 
-  async resolveApi() {
+  async resolveApi(network) {
     if (!apis[network]) {
       apis[network] = await createApi(network);
     }
     return apis[network];
+  }
+
+  async transfer(network,from,to,account){
+    debugger;
+    const api = await this.resolveApi(network);
+    const hash = await transfer(api,from,to,account);
+    return hash;
   }
 }
 

@@ -5,6 +5,13 @@ import * as ss58 from "@subsquid/ss58-codec";
 import { providers } from "../config/providers.js";
 import registryJson from "@substrate/ss58-registry";
 
+export class Account {
+  constructor(pair, mnemonic) {
+    this.mnemonic = mnemonic;
+    this.pair = pair;
+  }
+}
+
 export const keyring = new Keyring({ type: "sr25519" });
 
 // 1. 可以新建帐号，查看余额
@@ -23,18 +30,12 @@ export async function createAccount(nums) {
   // @ts-ignore
   const mnemonic = mnemonicGenerate(nums);
   const pair = keyring.addFromMnemonic(mnemonic);
-  return {
-    pair,
-    mnemonic,
-  };
+  return new Account(pair, mnemonic);
 }
 
 export function restoreAccount(mnemonic) {
   const pair = keyring.addFromMnemonic(mnemonic);
-  return {
-    pair,
-    mnemonic,
-  };
+  return new Account(pair, mnemonic);
 }
 
 // 1.2
@@ -57,20 +58,23 @@ export function getAddress(pair, registryNum = 0) {
 
 // 3
 
-export async function transfer(api, from, to, amount) {
-  try {
-    const tx = await api.tx.balances.transferKeepAlive(to, amount);
-    await tx.signAndSend(from, ({ events = [], status }) => {
-      if (status.isFinalized) {
-        console.log(
-          `从[from:${from}->to:${to} amount:${amount}]的转账成功。\n交易状态哈希：${status.hash.toHex()}`
-        );
-        resolve(status.hash);
-      }
-    });
-  } catch (error) {
-    reject(error);
-  }
+export  function transfer(api, from, to, amount) {
+  return new Promise(async (resolve,reject)=>{
+    try {
+      const tx = await api.tx.balances.transferKeepAlive(to, amount);
+      await tx.signAndSend(keyring, ({ events = [], status }) => {
+        if (status.isFinalized) {
+          console.log(
+            `从[from:${from}->to:${to} amount:${amount}]的转账成功。\n交易状态哈希：${status.hash.toHex()}`
+          );
+          resolve(status.hash);
+        }
+      });
+    } catch (error) {
+      console.log('error===',error);
+      reject(error);
+    }
+  })
 }
 
 // 4

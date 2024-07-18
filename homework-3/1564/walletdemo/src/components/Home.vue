@@ -2,7 +2,7 @@
   <div class="popup-wrap">
     <div v-if="loading" class="setup-loading">Loading...</div>
 
-    <div v-if="accountlen === 0" class="setup-steps">
+    <div class="setup-steps">
       <div v-if="step === 'first'" class="setup-box setup-box1">
         <h3>Welcome to MyWallet</h3>
         <div class="btns">
@@ -15,7 +15,11 @@
         <h3>Create Wallet</h3>
         <div>
           <label for="wordslen">Select Words Length:</label>
-          <select v-model="wordslen" @change="regenerate" id="wordslen" class="select">
+          <select
+            v-model="wordslen"
+            @change="regenerate"
+            id="wordslen"
+            class="select">
             <option value="12">12</option>
             <option value="15">15</option>
             <option value="18">18</option>
@@ -32,7 +36,11 @@
       <div v-if="step === 'second_import'" class="setup-box setup-box2">
         <h3>Import Wallet</h3>
         <div class="word-list">
-          <input v-model="importwords" class="input" placeholder="Enter mnemonic words" />
+          <textarea
+            v-model="importwords"
+            class="input"
+            placeholder="Enter mnemonic words"
+            style="height: 180px"></textarea>
         </div>
         <div class="errormsg">{{ errmsg }}</div>
         <div class="btns">
@@ -60,11 +68,14 @@
       </div>
     </div>
 
-    <div v-else>
-      <h1>Welcome to MyWallet by Xuxihai</h1>
+    <div>
+      <h3>accounts:</h3>
       <div class="accounts-list">
-        <label for="account-select">Select Account:</label>
-        <select v-model="selectedAcc" @change="changeSelect" id="account-select" class="select">
+        <select
+          v-model="selectedAcc"
+          @change="changeSelect"
+          id="account-select"
+          class="select">
           <option value="">请选择你的账号</option>
           <option v-for="item in accounts" :key="item.name" :value="item.name">
             {{ item.name }}
@@ -83,11 +94,29 @@
             <div class="layer2">
               <span>余额:{{ item.balance || 0 }}</span>
               <div class="links">
-                <input type="text" placeholder="目标地址" v-model="item.toaddress" />
-                <a @click="toTransfer(item)" v-if="item.balance > 0">转账</a>
-                <a @click="showBalance(item)">查询余额</a>
+                <button class="btn" @click="showBalance(item)">查询余额</button>
               </div>
             </div>
+            <div class="layer3">
+              <label for="">地址</label>
+              <input
+                type="text"
+                style="width: 460px"
+                placeholder="目标地址"
+                v-model="item.toaddress" />
+            </div>
+            <div class="layer3">
+              <label for="">金额</label>
+              <input
+                type="text"
+                style="width: 460px"
+                placeholder="金额"
+                v-model="item.toamount" />
+            </div>
+
+           <div class="layer4">
+            <button class="btn" @click="toTransfer(item)">转账</button>
+           </div>
           </li>
         </ul>
       </div>
@@ -123,7 +152,7 @@ const registryJson = [
     prefix: 137,
     network: "varatest",
     displayName: "Vara Test Network",
-    symbols: ["TVARA"],
+    symbols: ["VARA"],
     decimals: [12],
     standardAccount: "*25519",
     website: "https://vara.network/",
@@ -159,28 +188,36 @@ export default {
   methods: {
     loadAccounts() {
       return walletContext.loadData().then(() => {
-        Object.keys(walletContext.wallets).forEach((key) => {
-          this.accounts.push({ name: key, data: walletContext.wallets[key] });
+        this.accounts = [];
+        const accounts = walletContext.wallets;
+        const keys = this.accounts.map((p) => p.name);
+        accounts.forEach((temp) => {
+          if (keys.indexOf(temp.name) == -1) {
+            this.accounts.push(temp);
+          }
         });
         this.loading = false;
+        if (this.accounts.length > 0) {
+          this.selectedAcc = this.accounts[0].name;
+          this.changeSelect();
+        }
       });
     },
     async createWallet() {
-      const words = await walletContext.generateWallet(12);
-      console.log("words===", words);
-      this.newwords = words;
+      const account = await walletContext.generateWallet(12);
+      this.newwords = account.mnemonic;
       this.step = "second_create";
     },
     async regenerate() {
-      const words = await walletContext.generateWallet(parseInt(this.wordslen));
-      console.log("words===", words);
-      this.newwords = words;
+      const account = await walletContext.generateWallet(
+        parseInt(this.wordslen)
+      );
+      this.newwords = account.mnemonic;
     },
     importWallet() {
       this.step = "second_import";
     },
     confirmCreate() {
-      walletContext.importWallet(this.newwords);
       this.step = "four_success";
     },
     confirmImport() {
@@ -197,16 +234,18 @@ export default {
     // },
     toStart() {
       this.loadAccounts().then(() => {
-        this.selectedAcc = "Account1";
+        this.selectedAcc = this.accounts[this.accounts.length - 1].name;
         this.changeSelect();
+        this.step = "first";
       });
     },
     changeSelect() {
-      const account = walletContext.wallets[this.selectedAcc];
+      const account = walletContext.wallets.find(
+        (temp) => temp.name === this.selectedAcc
+      );
       const list = [];
       this.validRegistrys.forEach((temp) => {
         try {
-          temp.symbol = temp.symbols[0];
           temp.address = walletContext.getAddress(account, temp.prefix);
           list.push(temp);
         } catch (error) {
@@ -218,13 +257,14 @@ export default {
     },
     showBalance(item) {
       console.log(item);
-      walletContext.getBalance(item.network, item.address, item.decimals[0]).then(val => {
-        item.balance = val + item.symbol;
-      })
+      walletContext.getBalance(item.network, item.address).then((val) => {
+        item.balance = val;
+      });
     },
     toTransfer(item) {
-      console.log('transfer===', item);
-    }
+      console.log("transfer===", item);
+      walletContext.transfer(item.network, item.address, item.toaddress);
+    },
   },
 };
 </script>
