@@ -6,8 +6,10 @@
 ![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_1.png?raw=true)
 * 1.2 創建新錢包
 ![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_2.png?raw=true)
-1.3 看到新錢包地址
-1.4 查看當下餘額
+* 1.3 看到新錢包地址
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_3.png?raw=true)
+* 1.4 查看當下餘額
+![alt text](https://github.com/MartinYeung5/substrate-primary-15-homework/blob/main/homework-3/1601/public/1_4.png?raw=true)
 2. 显示钱包地址
 2.1 可以在登入後顯示錢包完整地址
 3. 转账到其他帐号
