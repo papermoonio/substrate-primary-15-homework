@@ -1,16 +1,15 @@
-console.log("aaa");
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { Keyring } from "@polkadot/keyring";
-import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
+const { ApiPromise, WsProvider } = require("@polkadot/api");
+const { Keyring } = require("@polkadot/keyring");
+const { cryptoWaitReady, mnemonicGenerate } = require("@polkadot/util-crypto");
 
 const LOCAL_URL = "ws://127.0.0.1:9944"; // 本地
-const LOCAL_WS_PROVIDER = new WsProvider(LOCAL_URL);
-const LOCAL_API = await ApiPromise.create({
-  provider: LOCAL_WS_PROVIDER,
-  types: {},
-});
+// const LOCAL_WS_PROVIDER = new WsProvider(LOCAL_URL);
+// const LOCAL_API = await ApiPromise.create({
+//   provider: LOCAL_WS_PROVIDER,
+//   types: {},
+// });
 
-await LOCAL_API.isReady;
+// await LOCAL_API.isReady;
 
 //创建钱包账户
 async function create() {
@@ -40,8 +39,8 @@ async function connect(url) {
     provider: WS_PROVIDER,
     types: {},
   });
-  await API.isReady;
   console.log("连接 polkadot 网络成功！!");
+  return API;
 }
 
 // 根据助记词获取钱包地址
@@ -54,6 +53,8 @@ function getAddressByMnemonicWord(mnemonicWord) {
 
 // 转账
 async function transferBalance(from, to, amount) {
+  const LOCAL_API = await connect(LOCAL_URL);
+  await LOCAL_API.isReady;
   const transfer = LOCAL_API.tx.balances.transfer(to, amount);
   const hash = await transfer.signAndSend(from, (result) => {
     console.log("当前状态：", result.status);
@@ -68,6 +69,8 @@ async function transferBalance(from, to, amount) {
 
 // 接收转账
 async function receiveTransfers(from, to, amount, addr) {
+  const LOCAL_API = await connect(LOCAL_URL);
+  await LOCAL_API.isReady;
   const { nonce } = await LOCAL_API.query.system.account(addr);
   const transfer = LOCAL_API.tx.balances.transfer(to, amount);
   const hash = await transfer.signAndSend(
@@ -88,6 +91,7 @@ async function receiveTransfers(from, to, amount, addr) {
         });
       } else if (status.isFinalized) {
         console.log("最终的区块hash：", status.asFinalized.toHex());
+        // 正常退出程序
         process.exit(0);
       }
     }
@@ -96,11 +100,7 @@ async function receiveTransfers(from, to, amount, addr) {
 
 // 入口启动函数
 const main = async () => {
-  const WS_PROVIDER = new WsProvider(local_url);
-  const API = await ApiPromise.create({
-    provider: WS_PROVIDER,
-    types: {},
-  });
+  const API = await connect(LOCAL_URL);
   await API.isReady;
 
   console.log("获取当前时间戳：", (await API.query.timestamp.now()).toHuman());
@@ -116,10 +116,12 @@ const main = async () => {
 main()
   .then(() => {
     console.log("钱包运行成功");
+    // 正常退出程序
     process.exit(0);
   })
   .catch((err) => {
     console.error();
     "钱包运行失败，原因是: " + err;
+    // 异常退出程序
     process.exit(1);
   });
