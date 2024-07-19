@@ -69,7 +69,7 @@ export function transfer(api, account, to, amount) {
   return new Promise(async (resolve, reject) => {
     try {
       const tx = await api.tx.balances.transferKeepAlive(to, amount);
-      await tx.signAndSend(account.pair, ({ events = [], status }) => {
+      await tx.signAndSend(account.pair, ({ events = [], status,txHash }) => {
         console.log("events===", events, status.toString());
         
         ElNotification({
@@ -83,9 +83,9 @@ export function transfer(api, account, to, amount) {
           console.log(
             `从[from:${
               account.name
-            }->to:${to} amount:${amount}]的转账成功。\n交易状态哈希：${status.hash.toHex()}`
+            }->to:${to} amount:${amount}]的转账成功。\n交易哈希：${txHash.toHex()}`
           );
-          resolve(status.hash.toHex());
+          resolve(txHash.toHex());
         }
       });
     } catch (error) {
