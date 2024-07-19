@@ -9,6 +9,7 @@ import {
   subscribe,
   Account,
   transfer,
+  createClaim,
 } from "../apis";
 
 const apis = {};
@@ -23,7 +24,7 @@ class WalletContext {
     const localWallets = localCache.getItem("__wallets__");
     if (localWallets) {
       localWallets.forEach((temp) => {
-        this.importWallet(temp.mnemonic,true);
+        this.importWallet(temp.mnemonic, true);
       });
     }
   }
@@ -33,13 +34,13 @@ class WalletContext {
     this.importWallet(account.mnemonic);
     return account;
   }
-  importWallet(words,disableSave) {
+  importWallet(words, disableSave) {
     const account = restoreAccount(words);
     this.idx++;
     const name = `Account${this.idx}`;
     account.name = name;
     this.wallets.push(account);
-    if(disableSave) return account;
+    if (disableSave) return account;
     localCache.setItem("__wallets__", this.wallets);
     return account;
   }
@@ -64,15 +65,20 @@ class WalletContext {
     return apis[network];
   }
 
-  async transfer(network,account,toaddress,amount){
+  async transfer(network, account, toaddress, amount) {
     const api = await this.resolveApi(network);
-    const hash = await transfer(api, account,toaddress,amount);
+    const hash = await transfer(api, account, toaddress, amount);
     return hash;
   }
 
-  async subscribe(network, address,listener){
+  async subscribe(network, address, listener) {
     const api = await this.resolveApi(network);
-    subscribe(api, address,listener);
+    subscribe(api, address, listener);
+  }
+  async callPoeSend(account, claimText) {
+    const api = await this.resolveApi("local");
+    const hash = await createClaim(api, account, claimText);
+    return hash;
   }
 }
 

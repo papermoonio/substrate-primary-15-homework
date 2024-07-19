@@ -123,6 +123,17 @@
         </ul>
       </div>
     </div>
+    <div class="poe-test">
+      <h1>poe test</h1>
+      <div class="poe-bo">
+        <label for="">text:</label>
+        <input type="text" v-model="cliamSendText" placeholder="claim text">
+        <button class="btn" @click="callPoeTest">ClaimTest</button>
+      </div>
+      <div class="poe-">
+        调用结果:{{ poeHash }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -173,12 +184,14 @@ export default {
     return {
       loading: true,
       accounts: [],
+      cliamSendText: "testdata",
       step: "first",
       newwords: "",
       wordslen: "12",
       importwords: "",
       password: "",
       errmsg: "",
+      poeHash: "",
       selectedAcc: "",
       addressList: [],
       validRegistrys: registryJson.filter((temp) => temp.symbols.length > 0),
@@ -305,6 +318,16 @@ export default {
         item.__unsub && item.__unsub();
       }
     },
+    callPoeTest(){
+      console.log('cliam===',this.cliamSendText);
+      const account = this.accounts.find(
+        (temp) => temp.name === this.selectedAcc
+      );
+      walletContext.callPoeSend(account,this.cliamSendText).then(hash=>{
+        console.log('hash===',hash);
+        this.poeHash= hash;
+      })
+    }
   },
 };
 </script>

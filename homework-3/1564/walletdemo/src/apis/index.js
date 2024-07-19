@@ -102,8 +102,12 @@ export function subscribe(api, address, listener) {
   });
 }
 // 5
-export async function callPoeChain(api) {
-  // TODO
+export async function createClaim(api,account,claimText) {
+  const claimHash = api.createType('Hash', api.registry.hash(claimText).toHex());
+  console.log("createClaim:",claimHash,account.pair);
+  const tx = api.tx.poe.createClaim(claimHash);
+  const hash = await tx.signAndSend(account.pair);
+  return hash.toHex();
 }
 
 // 6 other...
