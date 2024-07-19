@@ -47,7 +47,7 @@ function AccountList(props) {
       const API = props.API;
       const m = self.getMulti();
       try {
-        API.tx.balances.transferAllowDeath(address, parseInt(amount * m)).signAndSend(pair, (res) => {
+        API.tx.balances.transferKeepAlive(address, parseInt(amount * m)).signAndSend(pair, (res) => {
           const status = res.status.toJSON();
           setInfo(JSON.stringify(status));
           if(status.finalized) return ck && ck(status.finalized);

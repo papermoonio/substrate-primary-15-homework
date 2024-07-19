@@ -15,3 +15,13 @@
 - 使用React和polkadot.js开发一个单页面。
 
 ## 运行Demo
+
+- 在Demo文件夹下，运行以下命令
+
+    ```SHELL
+        #install the libs
+        yarn install
+
+        #run the demo
+        yarn start
+    ```
