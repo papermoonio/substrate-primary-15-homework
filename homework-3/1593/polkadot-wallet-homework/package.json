@@ -1,0 +1,20 @@
+{
+  "name": "polkadot-wallet-homework",
+  "version": "1.0.0",
+  "description": "Polkadot.js homework.",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [],
+  "dependencies": {
+    "@polkadot/api": "^12.2.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.24.8",
+    "jest": "^29.7.0"
+  }
+}
