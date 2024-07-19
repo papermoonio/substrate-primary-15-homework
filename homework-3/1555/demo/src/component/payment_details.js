@@ -11,6 +11,7 @@ function PaymentDetails(props) {
     transfer:[10,2],
   };
 
+  let [disable, setDisable] = useState(true);
   let [info, setInfo]= useState("");
 
   let [from, setFrom]=useState("");
@@ -52,7 +53,7 @@ function PaymentDetails(props) {
               const API = props.API;
               const m = self.getMulti();
               try {
-                API.tx.balances.transferAllowDeath(target, parseInt(amount * m)).signAndSend(pair, (res) => {
+                API.tx.balances.transferKeepAlive(target, parseInt(amount * m)).signAndSend(pair, (res) => {
                   const status = res.status.toJSON();
                   setInfo(JSON.stringify(status));
                   if(status.finalized){
@@ -118,6 +119,8 @@ function PaymentDetails(props) {
   useEffect(() => {
     self.fresh();
 
+    setDisable(props.API !== null ? false : true);
+
   }, [props.API,props.list]);
 
   return (
@@ -158,7 +161,7 @@ function PaymentDetails(props) {
           {info}
       </Col>
       <Col className='pt-2 text-end' md={size.transfer[1]} lg={size.transfer[1]} xl={size.transfer[1]} xxl={size.transfer[1]}>
-          <button className='btn btn-md btn-primary' onClick={(ev)=>{
+          <button className='btn btn-md btn-primary' disabled={disable} onClick={(ev)=>{
             self.clickTransfer(ev);
           }}>Transaction</button>
       </Col>

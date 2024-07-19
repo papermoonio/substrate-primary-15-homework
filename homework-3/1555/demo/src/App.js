@@ -1,4 +1,4 @@
-import { Container, Tabs, Tab, Row, Col } from 'react-bootstrap';
+import { Container, Tabs, Tab, Row, Col, Toast } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -6,6 +6,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import AccountAdd from './component/account_add';
 import AccountList from './component/account_list';
 import PaymentDetails from './component/payment_details';
+import AcnhorSet from './component/anchor_set';
 import TransactionSearch from './component/transaction_search';
 
 let wsAPI = null;
@@ -23,6 +24,7 @@ function App() {
 
   let [accounts, setAccounts] = useState([]);
   let [info, setInfo] = useState("");
+  let [eventInfo,setEventInfo]= useState("");
 
   const self = {
     changeNetwork:(ev)=>{
@@ -58,11 +60,37 @@ function App() {
         return ck && ck(error);
       });
     },
+    decode:(list)=>{
+      for(let i=0;i<list.length;i++){
+        const row=list[i];
+        //console.log(row);
+        if(row.event && 
+            row.event.data &&
+            row.event.index==="0x0602" 
+        ){
+          console.log(row);
+          const data=row.event.data;
+          setEventInfo(`${data[1]} get ${data[2]*0.000000000001} coins from ${data[0]}.`);
+          setTimeout(()=>{
+            setEventInfo("");
+          },8000);
+        }
+      }
+    },
     fresh:(n)=>{
       //console.log(n);
       setInfo(`Ready to link to node: ${nodes[n]}`);
-      self.init(() => {
+      self.init((wsAPI) => {
         setInfo(`Linked to node: ${nodes[n]}`);
+        // wsAPI.events.balances.Transfer.is((from,to,amount)=>{
+        //   console.log(from,to,amount);
+        // });
+        console.log(wsAPI.query.system.events);
+        wsAPI.query.system.events((evs)=>{
+          const arr=evs.toJSON();
+          //console.log(arr);
+          self.decode(arr);
+        });
       },n);
     },
   }
@@ -86,6 +114,7 @@ function App() {
         <Col className='pt-2' md={size.network[1]} lg={size.network[1]} xl={size.network[1]} xxl={size.network[1]}>
           {info}
         </Col>
+        
       </Row>
 
       <Row>
@@ -99,9 +128,15 @@ function App() {
         className="mb-3"
       >
         <Tab eventKey="account" title="Account Management">
+        
           <AccountAdd API={wsAPI} callback={(json,mnemonic) => {
             self.callbackNewAccount(json);
           }} />
+          <Row>
+            <Col className='pt-2 text-warning' md={size.row[2]} lg={size.row[2]} xl={size.row[2]} xxl={size.row[2]}>
+              {eventInfo}
+            </Col>
+          </Row>
           <AccountList API={wsAPI} list={accounts}/>
         </Tab>
         <Tab eventKey="payment" title="Payment Details">
@@ -110,8 +145,19 @@ function App() {
         {/* <Tab eventKey="transaction" title="Transaction Search">
           <TransactionSearch  API={wsAPI} />
         </Tab> */}
+        <Tab eventKey="anchor" title="Set Anchor">
+          <AcnhorSet API={wsAPI}  list={accounts} />
+        </Tab>
       </Tabs>
+      {/* <Toast show={true} onClose={()=>{}}>
+          <Toast.Header>
+            <strong className="me-auto">Bootstrap</strong>
+            <small>11 mins ago</small>
+          </Toast.Header>
+          <Toast.Body>Woohoo, you're reading this text in a Toast!</Toast.Body>
+        </Toast> */}
     </Container>
+    
   );
 }
 
