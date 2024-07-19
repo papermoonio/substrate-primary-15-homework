@@ -1,16 +1,6 @@
-import localCache from "../utils/localCache";
-import { cryptoWaitReady } from "@polkadot/util-crypto";
-import {
-  createAccount,
-  restoreAccount,
-  getAddress,
-  createApi,
-  getBalance,
-  subscribe,
-  Account,
-  transfer,
-  createClaim,
-} from "../apis";
+import localCache from '../utils/localCache';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { createAccount, restoreAccount, getAddress, createApi, getBalance, subscribe, Account, transfer, createClaim } from '../apis';
 
 const apis = {};
 
@@ -21,7 +11,7 @@ class WalletContext {
     this.ready = cryptoWaitReady().then(() => this.restoreWallet());
   }
   restoreWallet() {
-    const localWallets = localCache.getItem("__wallets__");
+    const localWallets = localCache.getItem('__wallets__');
     if (localWallets) {
       localWallets.forEach((temp) => {
         this.importWallet(temp.mnemonic, true);
@@ -41,7 +31,7 @@ class WalletContext {
     account.name = name;
     this.wallets.push(account);
     if (disableSave) return account;
-    localCache.setItem("__wallets__", this.wallets);
+    localCache.setItem('__wallets__', this.wallets);
     return account;
   }
 
@@ -76,7 +66,7 @@ class WalletContext {
     subscribe(api, address, listener);
   }
   async callPoeSend(account, claimText) {
-    const api = await this.resolveApi("local");
+    const api = await this.resolveApi('local');
     const hash = await createClaim(api, account, claimText);
     return hash;
   }

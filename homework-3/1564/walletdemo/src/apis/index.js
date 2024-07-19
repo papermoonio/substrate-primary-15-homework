@@ -1,10 +1,10 @@
-import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
-import { Keyring, decodeAddress } from "@polkadot/keyring";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import * as ss58 from "@subsquid/ss58-codec";
-import { providers } from "../config/providers.js";
-import registryJson from "@substrate/ss58-registry";
-import { ElNotification } from "element-plus";
+import { cryptoWaitReady, mnemonicGenerate } from '@polkadot/util-crypto';
+import { Keyring, decodeAddress } from '@polkadot/keyring';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import * as ss58 from '@subsquid/ss58-codec';
+import { providers } from '../config/providers.js';
+import registryJson from '@substrate/ss58-registry';
+import { ElNotification } from 'element-plus';
 import Big from 'big.js';
 
 export class Account {
@@ -14,8 +14,7 @@ export class Account {
   }
 }
 
-
-export const keyring = new Keyring({ type: "sr25519" });
+export const keyring = new Keyring({ type: 'sr25519' });
 
 // 1. 可以新建帐号，查看余额
 // 2. 显示钱包地址
@@ -47,13 +46,13 @@ export async function getBalance(api, address) {
   //   const now = await api.query.timestamp.now();
   // Retrieve the account balance & nonce via the system module
   const { data: balance } = await api.query.system.account(address);
-//   const num1 = Big('12345678901234567890');
-// const num2 = Big('9876543210987654321');
+  //   const num1 = Big('12345678901234567890');
+  // const num2 = Big('9876543210987654321');
   const val = Big(balance.free);
   const decoded = ss58.decode(address);
   const item = registryJson.find((temp) => temp.prefix === decoded.prefix);
   const decl = Big(10 ** item.decimals[0]);
-  console.log("address==balance===", val, val / decl);
+  console.log('address==balance===', val, val / decl);
   return val.div(decl).toString() + item.symbols[0];
 }
 
@@ -69,27 +68,23 @@ export function transfer(api, account, to, amount) {
   return new Promise(async (resolve, reject) => {
     try {
       const tx = await api.tx.balances.transferKeepAlive(to, amount);
-      await tx.signAndSend(account.pair, ({ events = [], status,txHash }) => {
-        console.log("events===", events, status.toString());
-        
+      await tx.signAndSend(account.pair, ({ events = [], status, txHash }) => {
+        console.log('events===', events, status.toString());
+
         ElNotification({
-          title: "event",
-          type: "success",
+          title: 'event',
+          type: 'success',
           message: status.toString(),
-          position: "bottom-left",
+          position: 'bottom-left',
         });
         debugger;
         if (status.isFinalized) {
-          console.log(
-            `从[from:${
-              account.name
-            }->to:${to} amount:${amount}]的转账成功。\n交易哈希：${txHash.toHex()}`
-          );
+          console.log(`从[from:${account.name}->to:${to} amount:${amount}]的转账成功。\n交易哈希：${txHash.toHex()}`);
           resolve(txHash.toHex());
         }
       });
     } catch (error) {
-      console.log("error===", error);
+      console.log('error===', error);
       reject(error);
     }
   });
@@ -102,9 +97,9 @@ export function subscribe(api, address, listener) {
   });
 }
 // 5
-export async function createClaim(api,account,claimText) {
+export async function createClaim(api, account, claimText) {
   const claimHash = api.createType('Hash', api.registry.hash(claimText).toHex());
-  console.log("createClaim:",claimHash,account.pair);
+  console.log('createClaim:', claimHash, account.pair);
   const tx = api.tx.poe.createClaim(claimHash);
   const hash = await tx.signAndSend(account.pair);
   return hash.toHex();

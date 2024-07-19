@@ -15,11 +15,7 @@
         <h3>Create Wallet</h3>
         <div>
           <label for="wordslen">Select Words Length:</label>
-          <select
-            v-model="wordslen"
-            @change="regenerate"
-            id="wordslen"
-            class="select">
+          <select v-model="wordslen" @change="regenerate" id="wordslen" class="select">
             <option value="12">12</option>
             <option value="15">15</option>
             <option value="18">18</option>
@@ -36,11 +32,7 @@
       <div v-if="step === 'second_import'" class="setup-box setup-box2">
         <h3>Import Wallet</h3>
         <div class="word-list">
-          <textarea
-            v-model="importwords"
-            class="input"
-            placeholder="Enter mnemonic words"
-            style="height: 180px"></textarea>
+          <textarea v-model="importwords" class="input" placeholder="Enter mnemonic words" style="height: 180px"></textarea>
         </div>
         <div class="errormsg">{{ errmsg }}</div>
         <div class="btns">
@@ -71,11 +63,7 @@
     <div>
       <h3>accounts:</h3>
       <div class="accounts-list">
-        <select
-          v-model="selectedAcc"
-          @change="changeSelect"
-          id="account-select"
-          class="select">
+        <select v-model="selectedAcc" @change="changeSelect" id="account-select" class="select">
           <option value="">请选择你的账号</option>
           <option v-for="item in accounts" :key="item.name" :value="item.name">
             {{ item.name }}
@@ -100,23 +88,17 @@
             </div>
             <div class="layer3">
               <label for="">地址</label>
-              <input
-                type="text"
-                style="width: 460px"
-                placeholder="目标地址"
-                v-model="item.toaddress" />
+              <input type="text" style="width: 460px" placeholder="目标地址" v-model="item.toaddress" />
             </div>
             <div class="layer3">
               <label for="">数量({{ item.symbol }})</label>
-              <input
-                type="text"
-                style="width: 460px"
-                placeholder="金额"
-                v-model="item.toamount" />
+              <input type="text" style="width: 460px" placeholder="金额" v-model="item.toamount" />
             </div>
 
             <div class="layer4">
-               <span v-if="item.hash">交易hash: <a :href="item.explorer+'/'+item.hash" target="__blank">{{item.hash}}</a></span>
+              <span v-if="item.hash"
+                >交易hash: <a :href="item.explorer + '/' + item.hash" target="__blank">{{ item.hash }}</a></span
+              >
               <button class="btn" @click="toTransfer(item)">转账</button>
             </div>
           </li>
@@ -127,55 +109,72 @@
       <h1>poe test</h1>
       <div class="poe-bo">
         <label for="">text:</label>
-        <input type="text" v-model="cliamSendText" placeholder="claim text">
-        <button class="btn" @click="callPoeTest">ClaimTest</button>
+        <input type="text" v-model="cliamSendText" placeholder="claim text" />
+        <button class="btn" @click="callPoeTest" v-loading="claiming">ClaimTest</button>
       </div>
-      <div class="poe-">
-        调用结果:{{ poeHash }}
-      </div>
+      <div class="poe-">调用结果:{{ poeHash }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { walletContext } from "../context";
+import { walletContext } from '../context';
 // import registryJson from "@substrate/ss58-registry";
-import "./style.scss";
-import { ElNotification } from "element-plus";
+import './style.scss';
+import { ElNotification } from 'element-plus';
+import { ElLoading } from 'element-plus';
+
+let loadingInstance;
+
+const showLoading = () => {
+  loadingInstance = ElLoading.service({ fullscreen: true });
+};
+const hideLoading = () => {
+  loadingInstance && loadingInstance.close();
+};
+
+const showErrorMsg = (message) => {
+  ElNotification({
+    title: 'err!!',
+    type: 'error',
+    message,
+    position: 'bottom-right',
+  });
+};
 
 const registryJson = [
   {
     prefix: 0,
-    network: "polkadot",
-    displayName: "Polkadot Relay Chain",
-    symbols: ["DOT"],
+    network: 'polkadot',
+    displayName: 'Polkadot Relay Chain',
+    symbols: ['DOT'],
     decimals: [10],
-    standardAccount: "*25519",
-    website: "https://polkadot.network",
-    explorer:"https://polkadot.subscan.io/extrinsic/",
-    testto:"1RFdWnR4gUY5mPvBtFaxdeFsDJAuuoDiJYhF7bvBgyFUKy5",
+    standardAccount: '*25519',
+    website: 'https://polkadot.network',
+    explorer: 'https://polkadot.subscan.io/extrinsic/',
+    testto: '1RFdWnR4gUY5mPvBtFaxdeFsDJAuuoDiJYhF7bvBgyFUKy5',
   },
   {
     prefix: 2,
-    network: "kusama",
-    displayName: "Kusama Relay Chain",
-    symbols: ["KSM"],
+    network: 'kusama',
+    displayName: 'Kusama Relay Chain',
+    symbols: ['KSM'],
     decimals: [12],
-    standardAccount: "*25519",
-    explorer:"https://kusama.subscan.io/extrinsic/",
-    website: "https://kusama.network",
-    testto:"Cza9VsDqGDzPtCqzx1diSB7ABam2H4G6BexUUtX7QAE2vAd",
+    standardAccount: '*25519',
+    explorer: 'https://kusama.subscan.io/extrinsic/',
+    website: 'https://kusama.network',
+    testto: 'Cza9VsDqGDzPtCqzx1diSB7ABam2H4G6BexUUtX7QAE2vAd',
   },
   {
     prefix: 137,
-    network: "vara",
-    displayName: "Vara Network",
-    symbols: ["VARA"],
+    network: 'vara',
+    displayName: 'Vara Network',
+    symbols: ['VARA'],
     decimals: [12],
-    standardAccount: "*25519",
-    website: "https://vara.network/",
-    explorer:"https://vara.subscan.io/extrinsic/",
-    testto:"kGfxF2ew9eSRnSAdj92xzW2kFXa47MX6g9vT5aZQr2ehe56T5",
+    standardAccount: '*25519',
+    website: 'https://vara.network/',
+    explorer: 'https://vara.subscan.io/extrinsic/',
+    testto: 'kGfxF2ew9eSRnSAdj92xzW2kFXa47MX6g9vT5aZQr2ehe56T5',
   },
 ];
 
@@ -184,16 +183,17 @@ export default {
     return {
       loading: true,
       accounts: [],
-      cliamSendText: "testdata",
-      step: "first",
-      newwords: "",
-      wordslen: "12",
-      importwords: "",
-      password: "",
-      errmsg: "",
-      poeHash: "",
-      selectedAcc: "",
+      cliamSendText: 'testdata',
+      step: 'first',
+      newwords: '',
+      wordslen: '12',
+      importwords: '',
+      password: '',
+      errmsg: '',
+      poeHash: '',
+      selectedAcc: '',
       addressList: [],
+      claiming: false,
       validRegistrys: registryJson.filter((temp) => temp.symbols.length > 0),
     };
   },
@@ -204,8 +204,8 @@ export default {
   },
   mounted() {
     this.loadAccounts();
-    console.log("Hello from the popup!");
-    console.log("registryJson===", registryJson);
+    console.log('Hello from the popup!');
+    console.log('registryJson===', registryJson);
   },
   methods: {
     loadAccounts() {
@@ -228,28 +228,26 @@ export default {
     async createWallet() {
       const account = await walletContext.generateWallet(12);
       this.newwords = account.mnemonic;
-      this.step = "second_create";
+      this.step = 'second_create';
     },
     async regenerate() {
-      const account = await walletContext.generateWallet(
-        parseInt(this.wordslen)
-      );
+      const account = await walletContext.generateWallet(parseInt(this.wordslen));
       this.newwords = account.mnemonic;
     },
     importWallet() {
-      this.step = "second_import";
+      this.step = 'second_import';
     },
     confirmCreate() {
-      this.step = "four_success";
+      this.step = 'four_success';
     },
     confirmImport() {
-      const len = this.importwords.split(" ").length;
+      const len = this.importwords.split(' ').length;
       if (![12, 15, 18, 21, 24].includes(len)) {
-        this.errmsg = "Invalid word length";
+        this.errmsg = 'Invalid word length';
         return;
       }
       walletContext.importWallet(this.importwords);
-      this.step = "four_success";
+      this.step = 'four_success';
     },
     // confirmPass() {
     //   this.step = "four_success";
@@ -258,56 +256,62 @@ export default {
       this.loadAccounts().then(() => {
         this.selectedAcc = this.accounts[this.accounts.length - 1].name;
         this.changeSelect();
-        this.step = "first";
+        this.step = 'first';
       });
     },
     changeSelect() {
-      const account = walletContext.wallets.find(
-        (temp) => temp.name === this.selectedAcc
-      );
+      const account = walletContext.wallets.find((temp) => temp.name === this.selectedAcc);
       this.addressList = [];
       this.validRegistrys.forEach(async (temp) => {
         try {
           temp.address = walletContext.getAddress(account, temp.prefix);
           temp.toaddress = temp.testto;
           temp.toamount = 1;
-          temp.balance = await walletContext.getBalance(temp.network,temp.address);
-          temp.symbol  =  temp.symbols[0];
+          temp.balance = await walletContext.getBalance(temp.network, temp.address);
+          temp.symbol = temp.symbols[0];
 
           this.addressList.push(temp);
         } catch (error) {
-          console.log("exception===", error);
+          console.log('exception===', error);
         }
       });
     },
-    showBalance(item) {
+    async showBalance(item) {
       console.log(item);
-      walletContext.getBalance(item.network, item.address).then((val) => {
+      try {
+        showLoading();
+        const val = await walletContext.getBalance(item.network, item.address);
         item.balance = val;
-      });
+      } catch (error) {
+        showErrorMsg(error.message);
+      } finally {
+        hideLoading();
+      }
     },
-    toTransfer(item) {
-      console.log("transfer===", item);
-      item.hash="";
-      const account = this.accounts.find(
-        (temp) => temp.name === this.selectedAcc
-      );
-      walletContext
-        .transfer(item.network, account, item.toaddress, item.toamount)
-        .then((hash) => {
-          item.hash=hash;
-          this.showBalance(item);
-        });
+    async toTransfer(item) {
+      try {
+        console.log('transfer===', item);
+        item.hash = '';
+        showLoading();
+        const account = this.accounts.find((temp) => temp.name === this.selectedAcc);
+        const hash = await walletContext.transfer(item.network, account, item.toaddress, item.toamount);
+        item.hash = hash;
+        this.showBalance(item);
+      } catch (error) {
+        showErrorMsg(error.message);
+      } finally {
+        hideLoading();
+      }
     },
     handleSub(item) {
       if (item.dosub) {
         walletContext
-          .subscribe(item.network, item.address,  (event)=> {
+          .subscribe(item.network, item.address, (event) => {
             ElNotification({
-              title: "balance:" + item.address,
-              type:"info",
-              message: "message:balance=" + event,
-              position: "bottom-left",
+              title: 'balance:' + item.address,
+              type: 'info',
+              message: 'message:balance=' + event,
+              position: 'bottom-left',
             });
             this.showBalance(item);
           })
@@ -318,16 +322,20 @@ export default {
         item.__unsub && item.__unsub();
       }
     },
-    callPoeTest(){
-      console.log('cliam===',this.cliamSendText);
-      const account = this.accounts.find(
-        (temp) => temp.name === this.selectedAcc
-      );
-      walletContext.callPoeSend(account,this.cliamSendText).then(hash=>{
-        console.log('hash===',hash);
-        this.poeHash= hash;
-      })
-    }
+    async callPoeTest() {
+      console.log('cliam===', this.cliamSendText);
+      try {
+        showLoading();
+        const account = this.accounts.find((temp) => temp.name === this.selectedAcc);
+        const hash = await walletContext.callPoeSend(account, this.cliamSendText);
+        console.log('hash===', hash);
+        this.poeHash = hash;
+      } catch (error) {
+        showErrorMsg(error.message);
+      } finally {
+        hideLoading();
+      }
+    },
   },
 };
 </script>
