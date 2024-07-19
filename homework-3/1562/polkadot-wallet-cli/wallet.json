@@ -1,0 +1,20 @@
+{
+  "wallets": {
+    "daijinwei": {
+      "name": "daijinwei",
+      "mnemonic": "below busy pudding fork october decorate deliver lock rabbit catalog file safe",
+      "account": {
+        "address": "5HnGzReDmPrawXLjXjtGTYcuHAyAQHXQwbNL4FgmFyLVKaJF",
+        "balance": 100000.0
+      }
+    },
+    "onblock": {
+      "name": "onblock",
+      "mnemonic": "ball page minor actor shallow filter tomato imitate correct goose genius parade",
+      "account": {
+        "address": "5Fhe1nenHptegWCSRjdgmatokgmzpaYnEi1Kci2iqWHeGSFF",
+        "balance": 100000.0
+      }
+    }
+  }
+}

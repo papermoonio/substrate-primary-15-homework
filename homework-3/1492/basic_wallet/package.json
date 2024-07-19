@@ -1,0 +1,22 @@
+{
+  "name": "basic_wallet",
+  "version": "0.1.0",
+  "description": "omglion's basic wallet",
+  "main": "index.js",
+  "author": "lion chen",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@polkadot/api": "^12.2.1",
+    "@polkadot/keyring": "^13.0.2",
+    "@polkadot/util-crypto": "^13.0.2",
+    "process": "^0.11.10",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "scripts": {
+    "start": "ts-node src/app.ts"
+  }
+}
