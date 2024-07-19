@@ -12,3 +12,13 @@
 
 
 - 可以开发一个chrome extension，网页，桌面App。如果不熟悉UI开发，可以用命令行代替。
+
+
+
+
+// online address: https://nft.cdts.site/mywallet/index.html
+
+
+
+
+
