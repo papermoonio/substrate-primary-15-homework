@@ -1,0 +1,55 @@
+Arguments: 
+  /usr/local/bin/node /Users/xiejun/.yarn/bin/yarnpkg
+
+PATH: 
+  /usr/local/opt/gettext/bin:/Users/xiejun/base/apache-flume-1.8.0-bin/bin:/Users/xiejun/base/kafka_2.11-2.1.1/bin:/Users/xiejun/base/sqoop-1.4.7.bin__hadoop-2.6.0/bin:/Users/xiejun/base/hbase-2.0.5/bin:/Users/xiejun/qt/QtIFW-3.2.0/bin:/Users/xiejun/.cargo/bin:/Users/xiejun/base/spark-2.4.3-bin-hadoop2.7/bin:/Applications/CMake.app/Contents/bin:/Users/xiejun/Lang/flutter/bin:/Users/xiejun/lang/scala-2.11.8/bin:/usr/local/mysql-5.7.27-macos10.14-x86_64/bin:/Users/xiejun/Base/hadoop-2.7.7/bin:/Users/xiejun/apps/apache-maven-3.6.1/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home/bin:/Users/xiejun/Qt5.9.8/5.9.8/clang_64/bin:/Users/xiejun/.yarn/bin:/Users/xiejun/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/usr/local/opt/gettext/bin:/Users/xiejun/base/apache-flume-1.8.0-bin/bin:/Users/xiejun/base/kafka_2.11-2.1.1/bin:/Users/xiejun/base/sqoop-1.4.7.bin__hadoop-2.6.0/bin:/Users/xiejun/base/hbase-2.0.5/bin:/Users/xiejun/qt/QtIFW-3.2.0/bin:/Users/xiejun/.cargo/bin:/Users/xiejun/base/spark-2.4.3-bin-hadoop2.7/bin:/Applications/CMake.app/Contents/bin:/Users/xiejun/Lang/flutter/bin:/Users/xiejun/lang/scala-2.11.8/bin:/usr/local/mysql-5.7.27-macos10.14-x86_64/bin:/Users/xiejun/Base/hadoop-2.7.7/bin:/Users/xiejun/apps/apache-maven-3.6.1/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home/bin:/Users/xiejun/Qt5.9.8/5.9.8/clang_64/bin:/Users/xiejun/.yarn/bin:/Users/xiejun/.config/yarn/global/node_modules/.bin:/Users/xiejun/apps/go/bin:/usr/local/Cellar/go/1.12.7/libexec/bin:/Users/xiejun/Library/Android/sdk/tools:/Users/xiejun/Library/Android/sdk/platform-tools:/Users/xiejun/base/hive-2.3.4/bin:/Users/xiejun/.rvm/bin:/Users/xiejun/apps/go/bin:/usr/local/Cellar/go/1.12.7/libexec/bin:/Users/xiejun/Library/Android/sdk/tools:/Users/xiejun/Library/Android/sdk/platform-tools:/Users/xiejun/base/hive-2.3.4/bin:/Users/xiejun/.rvm/bin:/usr/local/bin
+
+Yarn version: 
+  1.17.3
+
+Node version: 
+  20.15.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/xiejun/Library/Caches/Yarn/v4/npm-glob-parent-6.0.2-6d237d99083950c79290f24c7642a3de9a28f9e3/node_modules/glob-parent/LICENSE' -> '/Users/xiejun/Code/dev/subwallet/my-wallet/node_modules/eslint/node_modules/glob-parent/LICENSE'
+
+npm manifest: 
+  {
+    "private": true,
+    "author": "ixiejun <nkqhxj@163.com>",
+    "scripts": {
+      "dev": "max dev",
+      "build": "max build",
+      "format": "prettier --cache --write .",
+      "prepare": "husky",
+      "postinstall": "max setup",
+      "setup": "max setup",
+      "start": "npm run dev"
+    },
+    "dependencies": {
+      "@ant-design/icons": "^5.0.1",
+      "@ant-design/pro-components": "^2.4.4",
+      "@umijs/max": "^4.3.8",
+      "antd": "^5.4.0",
+      "@polkadot/api": "^12.2.1"
+    },
+    "devDependencies": {
+      "@types/react": "^18.0.33",
+      "@types/react-dom": "^18.0.11",
+      "husky": "^9",
+      "lint-staged": "^13.2.0",
+      "prettier": "^2.8.7",
+      "prettier-plugin-organize-imports": "^3.2.2",
+      "prettier-plugin-packagejson": "^2.4.3",
+      "typescript": "^5.0.3"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
