@@ -1,0 +1,136 @@
+.popup-wrap {
+  max-width: 800px;
+  min-width: 440px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.setup-loading,
+h3 {
+  text-align: center;
+  color: #333;
+}
+
+.setup-steps,
+.accounts-list,
+.address-list {
+  margin-top: 20px;
+}
+
+.setup-box {
+  padding: 20px;
+  // background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.setup-box1 h3,
+.setup-box2 h3,
+.setup-box3 h3,
+.setup-box4 h3 {
+  margin-bottom: 15px;
+}
+
+.btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.select,
+.input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.word-list {
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.errormsg {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.address-list ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.address-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.address-list .layer2 {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 12px;
+  button {
+    flex-basis: 104px;
+    height: 40px;
+  }
+  .links a {
+    cursor: pointer;
+  }
+}
+.address-list .layer3 {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 12px;
+  input {
+    padding: 8px;
+    font-size: 14px;
+  }
+  button {
+    flex-basis: 104px;
+    height: 40px;
+  }
+  .links a {
+    cursor: pointer;
+  }
+}
+
+.layer4 {
+  padding: 6px 12px;
+  display: flex;
+  justify-content: end;
+}
+
+.poe-bo {
+  display: flex;
+  label {
+    display: block;
+    width: 100px;
+  }
+  input {
+    padding: 6px 12px;
+    width: 330px;
+  }
+}
