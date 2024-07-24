@@ -1,0 +1,25 @@
+{
+  "name": "apps",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "ts-node src/app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@polkadot/api": "^11.2.1",
+    "@polkadot/api-augment": "^11.2.1",
+    "@polkadot/keyring": "^12.6.2",
+    "@polkadot/util-crypto": "^12.6.2",
+    "process": "^0.11.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "@types/readline-sync": "^1.4.8",
+    "readline-sync": "^1.4.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}
