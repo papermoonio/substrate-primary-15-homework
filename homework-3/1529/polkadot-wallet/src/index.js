@@ -86,7 +86,7 @@ function hideLoadingIndicator() {
 // 更新 updateAllAccountBalances 函数
 async function updateAllAccountBalances() {
     for (const account of accounts) {
-        account.balance = await getBalance(account.address);
+        await updateAccountBalance(account);
     }
     updateAccountList();
     saveAccounts(); // 保存更新后的账户信息
@@ -296,7 +296,6 @@ function showTransferModal(fromAccount) {
         modal.style.display = 'none';
     };
 }
-
 async function transfer(fromAccount, toAddress, amount) {
     if (!api) {
         console.error('API 未初始化');
@@ -307,26 +306,57 @@ async function transfer(fromAccount, toAddress, amount) {
     const sender = keyring.addFromUri(fromAccount.mnemonic);
 
     try {
-        if (!api.tx.balances || typeof api.tx.balances.transferKeepAlive !== 'function') {
-            console.error('API 结构不正确，无法找到转账函数');
-            console.log('可用的模块:', Object.keys(api.tx));
-            if (api.tx.balances) {
-                console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
-            }
-            throw new Error('转账函数不可用');
+        // 获取当前账户余额
+        const { data: { free: balance } } = await api.query.system.account(fromAccount.address);
+        const currentBalance = BigInt(balance);
+        const transferAmount = BigInt(amount * 1e12);
+
+        // 估算交易费用
+        const info = await api.tx.balances.transferKeepAlive(toAddress, transferAmount).paymentInfo(sender);
+        const fee = BigInt(info.partialFee);
+
+        // 检查余额是否足够
+        if (currentBalance < transferAmount + fee) {
+            console.log(currentBalance)
+            console.log(transferAmount , fee)
+            throw new Error('余额不足以支付转账金额和交易费用');
         }
 
-        const transfer = api.tx.balances.transferKeepAlive(toAddress, BigInt(amount * 1e12));
+        const transfer = api.tx.balances.transferKeepAlive(toAddress, transferAmount);
         const hash = await transfer.signAndSend(sender);
         console.log('转账成功，交易哈希:', hash.toHex());
+        
+        // 添加延迟以确保交易被处理
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 更新发送方和接收方的余额
+        await updateAccountBalance(fromAccount);
+        const toAccount = accounts.find(acc => acc.address === toAddress);
+        if (toAccount) {
+            await updateAccountBalance(toAccount);
+        }
+
         alert('转账成功！');
-        await updateAllAccountBalances();
-        showAccountDetails(fromAccount);
+        updateAccountList();
+        if (document.getElementById('accountDetails').innerHTML.includes(fromAccount.address)) {
+            showAccountDetails(fromAccount);
+        }
     } catch (error) {
         console.error('转账失败:', error);
-        alert('转账失败，请查看控制台了解详情。');
+        alert('转账失败: ' + error.message);
     }
 }
+
+async function updateAccountBalance(account) {
+    try {
+        const { data: { free: balance } } = await api.query.system.account(account.address);
+        account.balance = balance.toHuman();
+        console.log(`账户 ${account.name} 的余额已更新为: ${account.balance}`);
+    } catch (error) {
+        console.error(`更新账户 ${account.name} 的余额失败:`, error);
+    }
+}
+
 
 function updateAccountSelects() {
     const fromSelect = document.getElementById('fromAccount');
