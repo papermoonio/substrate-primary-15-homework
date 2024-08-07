@@ -22,6 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('networkSelect').addEventListener('change', initApi);
 });
 
+// 更新消息列表的函数
+function addMessageToList(message) {
+    const messageList = document.getElementById('messageList');
+    const messageItem = document.createElement('div');
+    messageItem.className = 'message-item';
+    messageItem.textContent = message;
+    messageList.prepend(messageItem); // 将新消息添加到列表顶部
+}
+
+// 监听账户余额变化
 async function initApi() {
     showLoadingIndicator();
     try {
@@ -32,11 +42,21 @@ async function initApi() {
         const provider = new WsProvider(providerUrl);
         api = await ApiPromise.create({ provider });
         console.log('API 已初始化');
-        
-        console.log('可用的模块:', Object.keys(api.tx));
-        if (api.tx.balances) {
-            console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
-        }
+
+        // 监听账户余额变化
+        accounts.forEach(account => {
+            api.query.system.account(account.address, (accountInfo) => {
+                // const newBalance = accountInfo.data.free.toString();
+                const newBalance = accountInfo.data.free;
+                // if (BigInt(newBalance) > BigInt(account.balance)) {
+                const message = `账户 ${account.name} 余额变化: ${newBalance} DOT`;
+                addMessageToList(message); // 添加消息到列表
+                sendNotification(account.name, newBalance);
+                account.balance = newBalance; // 更新余额
+                updateAccountList(); // 更新账户列表
+                // }
+            });
+        });
 
         await updateAllAccountBalances();
     } catch (error) {
