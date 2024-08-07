@@ -19,13 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAccounts();
     updateAccountSelects();
     document.getElementById('createAccount').addEventListener('click', createAccount);
+    document.getElementById('networkSelect').addEventListener('change', initApi);
 });
 
 async function initApi() {
     showLoadingIndicator();
     try {
         await cryptoWaitReady();
-        const provider = new WsProvider('wss://rpc.polkadot.io');
+        const networkSelect = document.getElementById('networkSelect');
+        const selectedNetwork = networkSelect.value;
+        const providerUrl = selectedNetwork === 'local' ? 'ws://127.0.0.1:9944' : 'wss://rpc.polkadot.io';
+        const provider = new WsProvider(providerUrl);
         api = await ApiPromise.create({ provider });
         console.log('API 已初始化');
         
@@ -39,6 +43,29 @@ async function initApi() {
         console.error('API 初始化失败:', error);
     } finally {
         hideLoadingIndicator();
+    }
+}
+
+
+async function refreshBalance(account) {
+    const balanceSpan = document.getElementById('accountBalance');
+    balanceSpan.textContent = '更新中...';
+    
+    try {
+        const newBalance = await getBalance(account.address);
+        account.balance = newBalance;
+        balanceSpan.textContent = newBalance;
+        
+        // 更新账户列表中的余额显示
+        updateAccountList();
+        
+        // 保存更新后的账户信息
+        saveAccounts();
+        
+        console.log(`账户 ${account.name} 的余额已更新`);
+    } catch (error) {
+        console.error('刷新余额失败:', error);
+        balanceSpan.textContent = '刷新失败';
     }
 }
 
@@ -56,11 +83,22 @@ function hideLoadingIndicator() {
     }
 }
 
+// 更新 updateAllAccountBalances 函数
 async function updateAllAccountBalances() {
     for (const account of accounts) {
         account.balance = await getBalance(account.address);
     }
     updateAccountList();
+    saveAccounts(); // 保存更新后的账户信息
+    // 如果当前正在显示账户详情，也更新详情页面
+    const accountDetails = document.getElementById('accountDetails');
+    if (accountDetails.innerHTML !== '') {
+        const displayedAddress = accountDetails.querySelector('p:nth-child(2)').textContent.split(':')[1].trim();
+        const displayedAccount = accounts.find(acc => acc.address === displayedAddress);
+        if (displayedAccount) {
+            showAccountDetails(displayedAccount);
+        }
+    }
 }
 
 function loadAccounts() {
@@ -74,7 +112,6 @@ function loadAccounts() {
 function saveAccounts() {
     localStorage.setItem('polkadotAccounts', JSON.stringify(accounts));
 }
-
 async function createAccount() {
     const accountName = generateRandomName();
     const mnemonic = mnemonicGenerate();
@@ -89,8 +126,40 @@ async function createAccount() {
     updateAccountSelects();
 
     if (api) {
-        account.balance = await getBalance(account.address);
+        const networkSelect = document.getElementById('networkSelect');
+        if (networkSelect.value === 'local') {
+            await fundNewAccount(account);
+        } else {
+            account.balance = await getBalance(account.address);
+            updateAccountList();
+        }
+    }
+}
+
+async function fundNewAccount(account) {
+    try {
+        const keyring = new Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice');
+
+        const transfer = api.tx.balances.transferKeepAlive(account.address, 10000); 
+        const hash = await transfer.signAndSend(alice);
+        console.log('新账户充值成功，交易哈希:', hash.toHex());
+        
+        // 添加延迟以确保交易被处理
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 直接查询最新余额
+        const { data: { free: balance } } = await api.query.system.account(account.address);
+        account.balance = balance.toHuman();
+        console.log('更新后的余额:', account.balance);
+
         updateAccountList();
+        if (document.getElementById('accountDetails').innerHTML.includes(account.address)) {
+            showAccountDetails(account);
+        }
+    } catch (error) {
+        console.error('新账户充值失败:', error);
+        account.balance = '充值失败';
     }
 }
 
@@ -138,13 +207,18 @@ async function showAccountDetails(account) {
         <h2>${account.name}</h2>
         <p><strong>地址:</strong> ${account.address}</p>
         <p><strong>助记词:</strong> ${account.mnemonic}</p>
-        <p><strong>余额:</strong> ${balance}</p>
+        <p><strong>余额:</strong> <span id="accountBalance">${balance}</span></p>
+        <button id="refreshBalanceButton">刷新余额</button>
         <button id="transferButton">转账</button>
+        <button id="fundButton">充值 (仅本地节点)</button>
     `;
     document.getElementById('accountDetails').innerHTML = detailsHtml;
     document.getElementById('transferButton').addEventListener('click', () => showTransferModal(account));
+    document.getElementById('fundButton').addEventListener('click', () => fundAccount(account));
+    document.getElementById('refreshBalanceButton').addEventListener('click', () => refreshBalance(account));
 }
 
+// 更新 getBalance 函数
 async function getBalance(address) {
     if (!api) {
         return 'API 未初始化';
@@ -155,6 +229,45 @@ async function getBalance(address) {
     } catch (error) {
         console.error('获取余额失败:', error);
         return '获取余额失败';
+    }
+}
+async function fundAccount(account) {
+    if (!api) {
+        console.error('API 未初始化');
+        return;
+    }
+
+    const networkSelect = document.getElementById('networkSelect');
+    if (networkSelect.value !== 'local') {
+        alert('充值功能仅在本地节点上可用');
+        return;
+    }
+
+    try {
+        const keyring = new Keyring({ type: 'sr25519' });
+        const alice = keyring.addFromUri('//Alice');
+
+        const transfer = api.tx.balances.transferKeepAlive(account.address, 10000000000000); // 转账 10 DOT
+        const hash = await transfer.signAndSend(alice);
+        console.log('充值成功，交易哈希:', hash.toHex());
+        
+        // 添加延迟以确保交易被处理
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 直接查询最新余额
+        const { data: { free: balance } } = await api.query.system.account(account.address);
+        account.balance = balance.toHuman();
+        console.log('更新后的余额:', account.balance);
+
+        updateAccountList();
+        if (document.getElementById('accountDetails').innerHTML.includes(account.address)) {
+            showAccountDetails(account);
+        }
+        
+        alert('充值成功！');
+    } catch (error) {
+        console.error('充值失败:', error);
+        alert('充值失败，请查看控制台了解详情。');
     }
 }
 

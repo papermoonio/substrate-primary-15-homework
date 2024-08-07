@@ -162,3 +162,21 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
     background-color: #45a049;
 }
+
+#refreshBalanceButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#refreshBalanceButton:hover {
+    background-color: #45a049;
+}
