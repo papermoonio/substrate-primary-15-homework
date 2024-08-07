@@ -7,7 +7,7 @@ let currentAccount;
 
 export default {
   async init() {
-    const provider = new WsProvider('wss://rpc.polkadot.io');
+    const provider = new WsProvider('ws://127.0.0.1:9944');
     api = await ApiPromise.create({ provider });
     console.log('Connected to Polkadot network');
   },
@@ -30,7 +30,7 @@ export default {
   },
 
   async transferFunds(from, to, amount) {
-    const transfer = api.tx.balances.transfer(to, amount);
+    const transfer = api.tx.balances.transferKeepAlive(to, amount);
     const hash = await transfer.signAndSend(from);
     return hash.toHex();
   },

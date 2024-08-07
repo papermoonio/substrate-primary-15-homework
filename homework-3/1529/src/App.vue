@@ -83,5 +83,52 @@ export default {
 </script>
 
 <style>
-/* 添加相应的CSS样式 */
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f0f0f0;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.activity-sidebar {
+  width: 300px;
+  background-color: #f0f0f0;
+  padding: 20px;
+}
+
+.activity-sidebar h2 {
+  margin-top: 0;
+}
+
+.activity-sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.activity-sidebar li {
+  margin-bottom: 10px;
+}
 </style>
