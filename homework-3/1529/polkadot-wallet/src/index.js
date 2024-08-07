@@ -6,26 +6,54 @@ import { mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
 let api;
 let accounts = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+    loadAccounts();
+    updateAccountSelects();
+    document.getElementById('createAccount').addEventListener('click', createAccount);
+});
+
 async function initApi() {
-    await cryptoWaitReady();
-    const provider = new WsProvider('wss://rpc.polkadot.io');
-    api = await ApiPromise.create({ provider });
-    console.log('API 已初始化');
-    
-    // 输出 API 结构信息
-    console.log('可用的模块:', Object.keys(api.tx));
-    if (api.tx.balances) {
-        console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
+    showLoadingIndicator();
+    try {
+        await cryptoWaitReady();
+        const provider = new WsProvider('wss://rpc.polkadot.io');
+        api = await ApiPromise.create({ provider });
+        console.log('API 已初始化');
+        
+        console.log('可用的模块:', Object.keys(api.tx));
+        if (api.tx.balances) {
+            console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
+        }
+
+        await updateAllAccountBalances();
+    } catch (error) {
+        console.error('API 初始化失败:', error);
+    } finally {
+        hideLoadingIndicator();
     }
 }
 
-function updateAccountList() {
-    const accountList = document.getElementById('accountList');
-    accountList.innerHTML = ''; // 清空列表
-    accounts.forEach(account => addAccountToList(account));
+function showLoadingIndicator() {
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'loadingIndicator';
+    loadingIndicator.textContent = 'API 正在初始化...';
+    document.body.appendChild(loadingIndicator);
 }
 
-// 从 localStorage 加载账户
+function hideLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        loadingIndicator.remove();
+    }
+}
+
+async function updateAllAccountBalances() {
+    for (const account of accounts) {
+        account.balance = await getBalance(account.address);
+    }
+    updateAccountList();
+}
+
 function loadAccounts() {
     const savedAccounts = localStorage.getItem('polkadotAccounts');
     if (savedAccounts) {
@@ -34,30 +62,26 @@ function loadAccounts() {
     }
 }
 
-
-// 保存账户到 localStorage
 function saveAccounts() {
     localStorage.setItem('polkadotAccounts', JSON.stringify(accounts));
 }
-
-// 初始化 API 并设置事件监听器
-initApi().then(() => {
-    document.getElementById('createAccount').addEventListener('click', createAccount);
-    loadAccounts();
-    updateAccountSelects();
-}).catch(console.error);
 
 async function createAccount() {
     const mnemonic = mnemonicGenerate();
     const keyring = new Keyring({ type: 'sr25519' });
     const pair = keyring.addFromUri(mnemonic);
 
-    const account = { address: pair.address, mnemonic };
+    const account = { address: pair.address, mnemonic, balance: 'Loading...' };
     accounts.push(account);
     saveAccounts();
 
     addAccountToList(account);
     updateAccountSelects();
+
+    if (api) {
+        account.balance = await getBalance(account.address);
+        updateAccountList();
+    }
 }
 
 function addAccountToList(account) {
@@ -65,14 +89,14 @@ function addAccountToList(account) {
     accountItem.className = 'account-item';
     
     const accountInfo = document.createElement('span');
-    accountInfo.textContent = `${account.address.slice(0, 10)}...`;
+    accountInfo.textContent = `${account.address.slice(0, 10)}... ${account.balance || ''}`;
     accountInfo.addEventListener('click', () => showAccountDetails(account));
     
     const deleteButton = document.createElement('button');
     deleteButton.textContent = '删除';
     deleteButton.className = 'delete-button';
     deleteButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // 阻止事件冒泡到账户项
+        e.stopPropagation();
         deleteAccount(account);
     });
     
@@ -88,10 +112,15 @@ function deleteAccount(accountToDelete) {
         saveAccounts();
         updateAccountList();
         updateAccountSelects();
-        document.getElementById('accountDetails').innerHTML = ''; // 清空账户详情
+        document.getElementById('accountDetails').innerHTML = '';
     }
 }
 
+function updateAccountList() {
+    const accountList = document.getElementById('accountList');
+    accountList.innerHTML = '';
+    accounts.forEach(account => addAccountToList(account));
+}
 
 async function showAccountDetails(account) {
     const balance = await getBalance(account.address);
@@ -154,7 +183,6 @@ async function transfer(fromAccount, toAddress, amount) {
     const sender = keyring.addFromUri(fromAccount.mnemonic);
 
     try {
-        // 检查 API 结构
         if (!api.tx.balances || typeof api.tx.balances.transferKeepAlive !== 'function') {
             console.error('API 结构不正确，无法找到转账函数');
             console.log('可用的模块:', Object.keys(api.tx));
@@ -164,12 +192,12 @@ async function transfer(fromAccount, toAddress, amount) {
             throw new Error('转账函数不可用');
         }
 
-        // 使用 transferKeepAlive 函数
-        const transfer = api.tx.balances.transferKeepAlive(toAddress, BigInt(amount * 1e12)); // 转换为 Planck
+        const transfer = api.tx.balances.transferKeepAlive(toAddress, BigInt(amount * 1e12));
         const hash = await transfer.signAndSend(sender);
         console.log('转账成功，交易哈希:', hash.toHex());
         alert('转账成功！');
-        showAccountDetails(fromAccount); // 刷新账户详情
+        await updateAllAccountBalances();
+        showAccountDetails(fromAccount);
     } catch (error) {
         console.error('转账失败:', error);
         alert('转账失败，请查看控制台了解详情。');
@@ -190,3 +218,5 @@ function updateAccountSelects() {
         toSelect.appendChild(option);
     });
 }
+
+initApi().catch(console.error);
