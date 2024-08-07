@@ -6,6 +6,15 @@ import { mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
 let api;
 let accounts = [];
 
+const adjectives = ['快速的', '聪明的', '勇敢的', '友好的', '强大的', '神秘的', '欢乐的', '睿智的', '敏捷的', '温柔的'];
+const nouns = ['狮子', '老虎', '熊猫', '大象', '鹰', '海豚', '狐狸', '猫头鹰', '蝴蝶', '龙'];
+
+function generateRandomName() {
+    const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${adjective}${noun}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadAccounts();
     updateAccountSelects();
@@ -67,11 +76,12 @@ function saveAccounts() {
 }
 
 async function createAccount() {
+    const accountName = generateRandomName();
     const mnemonic = mnemonicGenerate();
     const keyring = new Keyring({ type: 'sr25519' });
     const pair = keyring.addFromUri(mnemonic);
 
-    const account = { address: pair.address, mnemonic, balance: 'Loading...' };
+    const account = { name: accountName, address: pair.address, mnemonic, balance: 'Loading...' };
     accounts.push(account);
     saveAccounts();
 
@@ -89,7 +99,7 @@ function addAccountToList(account) {
     accountItem.className = 'account-item';
     
     const accountInfo = document.createElement('span');
-    accountInfo.textContent = `${account.address.slice(0, 10)}... ${account.balance || ''}`;
+    accountInfo.textContent = `${account.name} (${account.address.slice(0, 10)}...) ${account.balance || ''}`;
     accountInfo.addEventListener('click', () => showAccountDetails(account));
     
     const deleteButton = document.createElement('button');
@@ -125,6 +135,7 @@ function updateAccountList() {
 async function showAccountDetails(account) {
     const balance = await getBalance(account.address);
     const detailsHtml = `
+        <h2>${account.name}</h2>
         <p><strong>地址:</strong> ${account.address}</p>
         <p><strong>助记词:</strong> ${account.mnemonic}</p>
         <p><strong>余额:</strong> ${balance}</p>
@@ -213,7 +224,7 @@ function updateAccountSelects() {
     accounts.forEach(account => {
         const option = document.createElement('option');
         option.value = account.address;
-        option.textContent = `${account.address.slice(0, 10)}...`;
+        option.textContent = `${account.name} (${account.address.slice(0, 10)}...)`;
         fromSelect.appendChild(option.cloneNode(true));
         toSelect.appendChild(option);
     });
