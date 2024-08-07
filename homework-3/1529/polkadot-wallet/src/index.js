@@ -1,25 +1,51 @@
+import './styles.css';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/keyring';
 import { mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
-import './styles.css';
 
 let api;
-const accounts = [];
+let accounts = [];
 
 async function initApi() {
+    await cryptoWaitReady();
     const provider = new WsProvider('wss://rpc.polkadot.io');
     api = await ApiPromise.create({ provider });
     console.log('API 已初始化');
+    
+    // 输出 API 结构信息
+    console.log('可用的模块:', Object.keys(api.tx));
+    if (api.tx.balances) {
+        console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
+    }
+}
+
+function updateAccountList() {
+    const accountList = document.getElementById('accountList');
+    accountList.innerHTML = ''; // 清空列表
+    accounts.forEach(account => addAccountToList(account));
+}
+
+// 从 localStorage 加载账户
+function loadAccounts() {
+    const savedAccounts = localStorage.getItem('polkadotAccounts');
+    if (savedAccounts) {
+        accounts = JSON.parse(savedAccounts);
+        updateAccountList();
+    }
+}
+
+
+// 保存账户到 localStorage
+function saveAccounts() {
+    localStorage.setItem('polkadotAccounts', JSON.stringify(accounts));
 }
 
 // 初始化 API 并设置事件监听器
 initApi().then(() => {
     document.getElementById('createAccount').addEventListener('click', createAccount);
+    loadAccounts();
     updateAccountSelects();
 }).catch(console.error);
-
-
-document.getElementById('createAccount').addEventListener('click', createAccount);
 
 async function createAccount() {
     const mnemonic = mnemonicGenerate();
@@ -28,15 +54,44 @@ async function createAccount() {
 
     const account = { address: pair.address, mnemonic };
     accounts.push(account);
+    saveAccounts();
 
-    const accountItem = document.createElement('div');
-    accountItem.className = 'account-item';
-    accountItem.textContent = `${pair.address.slice(0, 10)}...`;
-    accountItem.addEventListener('click', () => showAccountDetails(account));
-
-    document.getElementById('accountList').appendChild(accountItem);
+    addAccountToList(account);
     updateAccountSelects();
 }
+
+function addAccountToList(account) {
+    const accountItem = document.createElement('div');
+    accountItem.className = 'account-item';
+    
+    const accountInfo = document.createElement('span');
+    accountInfo.textContent = `${account.address.slice(0, 10)}...`;
+    accountInfo.addEventListener('click', () => showAccountDetails(account));
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = '删除';
+    deleteButton.className = 'delete-button';
+    deleteButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // 阻止事件冒泡到账户项
+        deleteAccount(account);
+    });
+    
+    accountItem.appendChild(accountInfo);
+    accountItem.appendChild(deleteButton);
+
+    document.getElementById('accountList').appendChild(accountItem);
+}
+
+function deleteAccount(accountToDelete) {
+    if (confirm('确定要删除这个账户吗？此操作不可逆。')) {
+        accounts = accounts.filter(account => account.address !== accountToDelete.address);
+        saveAccounts();
+        updateAccountList();
+        updateAccountSelects();
+        document.getElementById('accountDetails').innerHTML = ''; // 清空账户详情
+    }
+}
+
 
 async function showAccountDetails(account) {
     const balance = await getBalance(account.address);
@@ -99,7 +154,18 @@ async function transfer(fromAccount, toAddress, amount) {
     const sender = keyring.addFromUri(fromAccount.mnemonic);
 
     try {
-        const transfer = api.tx.balances.transferKeepAlive(toAddress, amount * 1e12); // 转换为 Planck
+        // 检查 API 结构
+        if (!api.tx.balances || typeof api.tx.balances.transferKeepAlive !== 'function') {
+            console.error('API 结构不正确，无法找到转账函数');
+            console.log('可用的模块:', Object.keys(api.tx));
+            if (api.tx.balances) {
+                console.log('balances 模块中的可用函数:', Object.keys(api.tx.balances));
+            }
+            throw new Error('转账函数不可用');
+        }
+
+        // 使用 transferKeepAlive 函数
+        const transfer = api.tx.balances.transferKeepAlive(toAddress, BigInt(amount * 1e12)); // 转换为 Planck
         const hash = await transfer.signAndSend(sender);
         console.log('转账成功，交易哈希:', hash.toHex());
         alert('转账成功！');
@@ -124,6 +190,3 @@ function updateAccountSelects() {
         toSelect.appendChild(option);
     });
 }
-
-// 初始化账户选择下拉列表
-updateAccountSelects();
