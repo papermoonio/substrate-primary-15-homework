@@ -1,6 +1,7 @@
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const { mnemonicGenerate, mnemonicToMiniSecret, ed25519PairFromSeed, encodeAddress } = require('@polkadot/util-crypto');
 const { Keyring } = require('@polkadot/keyring');
+const { BN } = require('@polkadot/util');
 
 async function createAccount() {
   const mnemonic = mnemonicGenerate();
@@ -51,32 +52,65 @@ async function transfer(api, fromAddress, toAddress, amount) {
   }
 }
 
-async function main() {
-  const provider = new WsProvider('wss://rpc.polkadot.io');
-  const api = await ApiPromise.create({ provider });
-
-  const args = process.argv.slice(2);
-  const command = args[0];
-
-  try {
-    switch (command) {
-      case 'create-account':
-        await createAccount();
-        break;
-      case 'check-balance':
-        await checkBalance(api, args[1]);
-        break;
-      case 'transfer':
-        await transfer(api, args[1], args[2], args[3]);
-        break;
-      default:
-        console.log('无效命令。使用 "create-account"、"check-balance <地址>" 或 "transfer <发送方地址> <接收方地址> <金额>"。');
-    }
-  } catch (error) {
-    console.error('操作失败:', error);
-  } finally {
-    await api.disconnect();
+async function monitorBalance(api, address) {
+    console.log(`开始监控地址 ${address} 的余额变化...`);
+    
+    let lastBalance = new BN(0);
+    const unsubscribe = await api.query.system.account(address, ({ data: balance }) => {
+      const free = balance.free;
+      if (free.gt(lastBalance)) {
+        const difference = free.sub(lastBalance);
+        console.log(`入账提醒: 地址 ${address} 收到 ${api.createType('Balance', difference).toHuman()} 的转账!`);
+        console.log(`当前余额: ${free.toHuman()}`);
+      }
+      lastBalance = free;
+    });
+  
+    // 返回取消订阅函数,以便在需要时停止监控
+    return unsubscribe;
   }
-}
+
+async function main() {
+    const provider = new WsProvider('wss://rpc.polkadot.io');
+    const api = await ApiPromise.create({ provider });
+  
+    await api.isReady;
+    console.log('API 已就绪');
+  
+    const args = process.argv.slice(2);
+    const command = args[0];
+  
+    try {
+      switch (command) {
+        case 'create-account':
+          await createAccount();
+          break;
+        case 'check-balance':
+          await checkBalance(api, args[1]);
+          break;
+        case 'transfer':
+          await transfer(api, args[1], args[2], args[3], args[4]);
+          break;
+        case 'monitor-balance':
+          if (args.length !== 2) {
+            console.error('使用方法: monitor-balance <地址>');
+            return;
+          }
+          const unsubscribe = await monitorBalance(api, args[1]);
+          // 保持程序运行,直到用户手动终止
+          console.log('按 Ctrl+C 停止监控');
+          process.on('SIGINT', () => {
+            unsubscribe();
+            process.exit();
+          });
+          break;
+        default:
+          console.log('无效命令。使用 "create-account"、"check-balance <地址>"、"transfer <发送方地址> <接收方地址> <金额> <助记词>" 或 "monitor-balance <地址>"。');
+      }
+    } catch (error) {
+      console.error('操作失败:', error);
+    }
+  }
+  
 
 main().catch(console.error);
