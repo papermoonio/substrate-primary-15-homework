@@ -30,8 +30,11 @@ export default {
   },
 
   async transferFunds(from, to, amount) {
+    console.log(555, from, to, amount)
+    const keyring = new Keyring({ type: 'sr25519' });
+    const sender = keyring.addFromUri(from.mnemonic);
     const transfer = api.tx.balances.transferKeepAlive(to, amount);
-    const hash = await transfer.signAndSend(from);
+    const hash = await transfer.signAndSend(sender);
     return hash.toHex();
   },
 
@@ -40,6 +43,15 @@ export default {
     const tx = api.tx.poe.createClaim(claimHash);
     const hash = await tx.signAndSend(currentAccount);
     return hash.toHex();
+  },
+  
+  async depositFunds(to, amount) {
+    console.log(111, to, amount)
+    const keyring = new Keyring({ type: 'sr25519' });
+    const alex = keyring.addFromUri('//Alice');
+
+    const transfer = api.tx.balances.transferKeepAlive(to, amount);
+    await transfer.signAndSend(alex);
   },
 
   listenForAccountActivity(callback) {

@@ -10,7 +10,7 @@
       </ul>
     </div>
     <div class="main-content">
-      <account-details v-if="selectedAccount" :account="selectedAccount" @transfer="handleTransfer" @poe="handlePoETransaction"></account-details>
+      <account-details v-if="selectedAccount" :account="selectedAccount" @transfer="handleTransfer" @poe="handlePoETransaction" @deposit="handleDeposit"></account-details>
     </div>
     <div class="activity-sidebar">
       <h2>Account Activity</h2>
@@ -56,9 +56,26 @@ export default {
     },
     async handleTransfer(from, to, amount) {
       try {
+
         await api.transferFunds(from, to, amount);
+
+        // 转账成功后的逻辑，例如更新账户余额、显示成功消息等
+        // ...
+
       } catch (error) {
         console.error('Error transferring funds:', error);
+        // 处理转账错误，例如显示错误消息
+        // ...
+      }
+    },  
+    async fetchSelectedAccountBalance() {
+      if (this.selectedAccount) {
+        try {
+          console.log(222,this.selectedAccount.address)
+          this.selectedAccount.balance = await api.getBalance(this.selectedAccount.address);
+        } catch (error) {
+          console.error('Error fetching balance:', error);
+        }
       }
     },
     async handlePoETransaction(claim) {
@@ -66,6 +83,15 @@ export default {
         await api.callPoETransaction(claim);
       } catch (error) {
         console.error('Error calling PoE transaction:', error);
+      }
+    },
+    async handleDeposit(to, amount) {
+      try {
+        await api.depositFunds(to, amount); 
+        await this.fetchSelectedAccountBalance();
+        // ...
+      } catch (error) {
+        console.error('Error depositing funds:', error); 
       }
     },
   },
@@ -114,9 +140,14 @@ export default {
 }
 
 .activity-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
   width: 300px;
+  height: 100%;
   background-color: #f0f0f0;
   padding: 20px;
+  overflow-y: auto;
 }
 
 .activity-sidebar h2 {
