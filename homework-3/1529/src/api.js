@@ -38,11 +38,26 @@ export default {
     return hash.toHex();
   },
 
-  async callPoETransaction(claim) {
-    const claimHash = api.createType('Hash', api.registry.hash(claim).toHex());
-    const tx = api.tx.poe.createClaim(claimHash);
-    const hash = await tx.signAndSend(currentAccount);
-    return hash.toHex();
+  async callPoETransaction(from, claim) {
+    console.log(8888, from, claim)
+    const keyring = new Keyring({ type: 'sr25519' });
+    const sender = keyring.addFromUri(from.mnemonic);
+
+    if (api.tx.poe && api.tx.poe.createClaim) {
+      await api.tx.poe
+        .createClaim(claim)
+        .signAndSend(sender, { nonce: -1 }, result => {
+          console.log(`Current status is ${result.status}`);
+
+          if (result.status.isInBlock) {
+            console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+          } else if (result.status.isFinalized) {
+            console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+          }
+        });
+    } else {
+      console.error('The "poe" module or "createClaim" transaction does not exist in the Substrate chain.');
+    }
   },
   
   async depositFunds(to, amount) {

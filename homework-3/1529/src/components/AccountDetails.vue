@@ -66,7 +66,7 @@ export default {
       this.transferAmount = 0;
     },
     callPoETransaction() {
-      this.$emit('poe', this.poeClaim);
+      this.$emit('poe', this.account, this.poeClaim);
       this.poeClaim = '';
     },
     depositFunds() {

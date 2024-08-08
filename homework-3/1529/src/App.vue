@@ -78,9 +78,9 @@ export default {
         }
       }
     },
-    async handlePoETransaction(claim) {
+    async handlePoETransaction(form, claim) {
       try {
-        await api.callPoETransaction(claim);
+        await api.callPoETransaction(form, claim);
       } catch (error) {
         console.error('Error calling PoE transaction:', error);
       }
